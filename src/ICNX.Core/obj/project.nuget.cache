@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "gkvzQj9shbk=",
+  "success": true,
+  "projectFilePath": "/Users/saadal-ageel/cnex-sharp/src/ICNX.Core/ICNX.Core.csproj",
+  "expectedPackageFiles": [
+    "/Users/saadal-ageel/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/9.0.8/microsoft.extensions.dependencyinjection.abstractions.9.0.8.nupkg.sha512",
+    "/Users/saadal-ageel/.nuget/packages/microsoft.extensions.logging.abstractions/9.0.8/microsoft.extensions.logging.abstractions.9.0.8.nupkg.sha512",
+    "/Users/saadal-ageel/.nuget/packages/system.reactive/6.0.1/system.reactive.6.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}

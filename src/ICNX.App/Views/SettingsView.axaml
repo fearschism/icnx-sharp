@@ -1,0 +1,542 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ICNX.App.ViewModels"
+             xmlns:conv="using:ICNX.App.Converters"
+             x:Class="ICNX.App.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+    <UserControl.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid ColumnDefinitions="180,*">
+        
+        <!-- Settings Sidebar -->
+        <Border Grid.Column="0" 
+                Background="{StaticResource SurfaceGlassBrush}" 
+                BorderThickness="0,0,1,0"
+                BorderBrush="{StaticResource BorderDefaultBrush}"
+                Padding="0,20">
+            <StackPanel Spacing="4">
+                
+                <!-- General Button -->
+                <Button Name="GeneralButton"
+                        Width="160" Height="36"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        Margin="10,0"
+                        Click="OnSettingsSidebarButtonClick"
+                        Tag="0"
+                        HorizontalContentAlignment="Left"
+                        Padding="12,0"
+                        Classes="selected">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="⚙" FontSize="14" VerticalAlignment="Center"/>
+                        <TextBlock Text="General" FontSize="13" FontWeight="Medium" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+                        </Style>
+                        <Style Selector="Button.selected">
+                            <Setter Property="Background" Value="#4D6366F1"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+                
+                <!-- Retry Policy Button -->
+                <Button Name="RetryButton"
+                        Width="160" Height="36"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        Margin="10,0"
+                        Click="OnSettingsSidebarButtonClick"
+                        Tag="1"
+                        HorizontalContentAlignment="Left"
+                        Padding="12,0">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="🔄" FontSize="14" VerticalAlignment="Center"/>
+                        <TextBlock Text="Retry Policy" FontSize="13" FontWeight="Medium" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+                        </Style>
+                        <Style Selector="Button.selected">
+                            <Setter Property="Background" Value="#4D6366F1"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+                
+                <!-- Appearance Button -->
+                <Button Name="AppearanceButton"
+                        Width="160" Height="36"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        Margin="10,0"
+                        Click="OnSettingsSidebarButtonClick"
+                        Tag="2"
+                        HorizontalContentAlignment="Left"
+                        Padding="12,0">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="🎨" FontSize="14" VerticalAlignment="Center"/>
+                        <TextBlock Text="Appearance" FontSize="13" FontWeight="Medium" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+                        </Style>
+                        <Style Selector="Button.selected">
+                            <Setter Property="Background" Value="#4D6366F1"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+                
+                <!-- Import/Export Button -->
+                <Button Name="ImportExportButton"
+                        Width="160" Height="36"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        Margin="10,0"
+                        Click="OnSettingsSidebarButtonClick"
+                        Tag="3"
+                        HorizontalContentAlignment="Left"
+                        Padding="12,0">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="📁" FontSize="14" VerticalAlignment="Center"/>
+                        <TextBlock Text="Import/Export" FontSize="13" FontWeight="Medium" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+                        </Style>
+                        <Style Selector="Button.selected">
+                            <Setter Property="Background" Value="#4D6366F1"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+                
+            </StackPanel>
+        </Border>
+        
+        <!-- Settings Content -->
+        <ScrollViewer Grid.Column="1">
+            <StackPanel Spacing="24" Margin="24">
+                
+                <!-- Header -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Settings" 
+                              FontSize="32" 
+                              FontWeight="Light"
+                              Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <TextBlock Text="Configure ICNX to your preferences" 
+                              FontSize="16"
+                              Foreground="{StaticResource TextSecondaryBrush}"/>
+                </StackPanel>
+
+                <!-- Status Bar -->
+                <Border Background="{StaticResource SurfaceGlassBrush}"
+                        BorderBrush="{StaticResource BorderDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16,12">
+                    <Grid ColumnDefinitions="*,Auto,Auto">
+                        <TextBlock Text="{Binding StatusMessage}"
+                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                  VerticalAlignment="Center"/>
+                        
+                        <Button Grid.Column="1"
+                                Content="Save"
+                                Command="{Binding SaveSettingsCommand}"
+                                IsEnabled="{Binding HasUnsavedChanges}"
+                                Background="{StaticResource AccentPrimaryBrush}"
+                                Foreground="White"
+                                Padding="16,8"
+                                Margin="8,0,0,0"/>
+                        
+                        <Button Grid.Column="2"
+                                Content="Reset to Defaults"
+                                Command="{Binding ResetToDefaultsCommand}"
+                                Background="{StaticResource SurfaceElevatedBrush}"
+                                Foreground="{StaticResource TextPrimaryBrush}"
+                                Padding="16,8"
+                                Margin="8,0,0,0"/>
+                    </Grid>
+                </Border>
+                
+                <!-- General Settings Content -->
+                <StackPanel Name="GeneralContent" Spacing="20" IsVisible="{Binding IsGeneralVisible}">
+                    
+                    <!-- Download Directory -->
+                    <Border Background="{StaticResource SurfaceCardBrush}"
+                            BorderBrush="{StaticResource BorderDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="20">
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="Download Directory" 
+                                      FontSize="18" 
+                                      FontWeight="SemiBold"
+                                      Foreground="{StaticResource TextPrimaryBrush}"/>
+                            
+                            <Grid ColumnDefinitions="*,Auto,Auto">
+                                <TextBox Grid.Column="0"
+                                        Text="{Binding DownloadDirectory}"
+                                        Watermark="Enter download directory path..."
+                                        Background="{StaticResource SurfaceElevatedBrush}"
+                                        BorderBrush="{StaticResource BorderDefaultBrush}"
+                                        Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <Button Grid.Column="1"
+                                        Content="Browse"
+                                        Command="{Binding BrowseDownloadDirectoryCommand}"
+                                        Margin="8,0,0,0"
+                                        Padding="12,6"/>
+                                
+                                <Button Grid.Column="2"
+                                        Content="Test"
+                                        Command="{Binding TestDownloadDirectoryCommand}"
+                                        Margin="8,0,0,0"
+                                        Padding="12,6"/>
+                            </Grid>
+                            
+                            <TextBlock Text="Default location where downloaded files will be saved"
+                                      FontSize="12"
+                                      Foreground="{StaticResource TextMutedBrush}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Download Behavior -->
+                    <Border Background="{StaticResource SurfaceCardBrush}"
+                            BorderBrush="{StaticResource BorderDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="20">
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="Download Behavior" 
+                                      FontSize="18" 
+                                      FontWeight="SemiBold"
+                                      Foreground="{StaticResource TextPrimaryBrush}"/>
+                            
+                            <!-- Concurrency -->
+                            <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto">
+                                <TextBlock Grid.Column="0" Grid.Row="0"
+                                          Text="Concurrent Downloads:"
+                                          VerticalAlignment="Center"
+                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Spacing="12">
+                                    <Slider Value="{Binding Concurrency}"
+                                           Minimum="1" Maximum="16"
+                                           Width="200"
+                                           VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Concurrency}"
+                                              VerticalAlignment="Center"
+                                              FontWeight="SemiBold"
+                                              Foreground="{StaticResource AccentPrimaryBrush}"/>
+                                </StackPanel>
+                                
+                                <TextBlock Grid.Column="1" Grid.Row="1"
+                                          Text="Number of files to download simultaneously"
+                                          FontSize="12"
+                                          Foreground="{StaticResource TextMutedBrush}"
+                                          Margin="0,4,0,0"/>
+                            </Grid>
+
+                            <!-- Speed Limit -->
+                            <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto">
+                                <CheckBox Grid.Column="0" Grid.Row="0"
+                                         Content="Speed Limit (MB/s):"
+                                         IsChecked="{Binding SpeedLimitEnabled}"
+                                         Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <TextBox Grid.Column="1" Grid.Row="0"
+                                        Text="{Binding SpeedLimitText}"
+                                        IsEnabled="{Binding SpeedLimitEnabled}"
+                                        Watermark="No limit"
+                                        Width="150"
+                                        HorizontalAlignment="Left"/>
+                                
+                                <TextBlock Grid.Column="1" Grid.Row="1"
+                                          Text="Limit download speed to conserve bandwidth"
+                                          FontSize="12"
+                                          Foreground="{StaticResource TextMutedBrush}"
+                                          Margin="0,4,0,0"/>
+                            </Grid>
+
+                            <!-- Auto Resume -->
+                            <Grid ColumnDefinitions="200,*">
+                                <CheckBox Grid.Column="0"
+                                         Content="Auto-resume on launch"
+                                         IsChecked="{Binding AutoResumeOnLaunch}"
+                                         Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <TextBlock Grid.Column="1"
+                                          Text="Automatically resume paused downloads when app starts"
+                                          FontSize="12"
+                                          Foreground="{StaticResource TextMutedBrush}"
+                                          VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <!-- Script Auto Detection -->
+                            <Grid ColumnDefinitions="200,*">
+                                <CheckBox Grid.Column="0"
+                                         Content="Enable script detection"
+                                         IsChecked="{Binding EnableScriptAutoDetection}"
+                                         Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <TextBlock Grid.Column="1"
+                                          Text="Automatically detect and extract download links using scripts"
+                                          FontSize="12"
+                                          Foreground="{StaticResource TextMutedBrush}"
+                                          VerticalAlignment="Center"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Retry Policy Content -->
+                <StackPanel Name="RetryContent" Spacing="20" IsVisible="{Binding IsRetryVisible}">
+                    
+                    <Border Background="{StaticResource SurfaceCardBrush}"
+                            BorderBrush="{StaticResource BorderDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="20">
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="Retry Configuration" 
+                                      FontSize="18" 
+                                      FontWeight="SemiBold"
+                                      Foreground="{StaticResource TextPrimaryBrush}"/>
+                            
+                            <!-- Enable Retry -->
+                            <CheckBox Content="Enable automatic retry on failures"
+                                     IsChecked="{Binding RetryEnabled}"
+                                     Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                            <!-- Max Attempts -->
+                            <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto" 
+                                 IsEnabled="{Binding RetryEnabled}">
+                                <TextBlock Grid.Column="0" Grid.Row="0"
+                                          Text="Max Retry Attempts:"
+                                          VerticalAlignment="Center"
+                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Spacing="12">
+                                    <Slider Value="{Binding MaxRetryAttempts}"
+                                           Minimum="0" Maximum="10"
+                                           Width="200"
+                                           VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding MaxRetryAttempts}"
+                                              VerticalAlignment="Center"
+                                              FontWeight="SemiBold"
+                                              Foreground="{StaticResource AccentPrimaryBrush}"/>
+                                </StackPanel>
+                                
+                                <TextBlock Grid.Column="1" Grid.Row="1"
+                                          Text="Number of times to retry a failed download"
+                                          FontSize="12"
+                                          Foreground="{StaticResource TextMutedBrush}"
+                                          Margin="0,4,0,0"/>
+                            </Grid>
+
+                            <!-- Base Delay -->
+                            <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto"
+                                 IsEnabled="{Binding RetryEnabled}">
+                                <TextBlock Grid.Column="0" Grid.Row="0"
+                                          Text="Base Delay (ms):"
+                                          VerticalAlignment="Center"
+                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Spacing="12">
+                                    <Slider Value="{Binding BaseRetryDelayMs}"
+                                           Minimum="100" Maximum="10000"
+                                           Width="200"
+                                           VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding BaseRetryDelayMs}"
+                                              VerticalAlignment="Center"
+                                              FontWeight="SemiBold"
+                                              Foreground="{StaticResource AccentPrimaryBrush}"/>
+                                </StackPanel>
+                                
+                                <TextBlock Grid.Column="1" Grid.Row="1"
+                                          Text="Initial delay before first retry attempt"
+                                          FontSize="12"
+                                          Foreground="{StaticResource TextMutedBrush}"
+                                          Margin="0,4,0,0"/>
+                            </Grid>
+
+                            <!-- Backoff Factor -->
+                            <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto"
+                                 IsEnabled="{Binding RetryEnabled}">
+                                <TextBlock Grid.Column="0" Grid.Row="0"
+                                          Text="Backoff Factor:"
+                                          VerticalAlignment="Center"
+                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Spacing="12">
+                                    <Slider Value="{Binding BackoffFactor}"
+                                           Minimum="1.0" Maximum="5.0"
+                                           Width="200"
+                                           VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding BackoffFactor, StringFormat='{}{0:F1}'}"
+                                              VerticalAlignment="Center"
+                                              FontWeight="SemiBold"
+                                              Foreground="{StaticResource AccentPrimaryBrush}"/>
+                                </StackPanel>
+                                
+                                <TextBlock Grid.Column="1" Grid.Row="1"
+                                          Text="Multiplier for exponential backoff delay"
+                                          FontSize="12"
+                                          Foreground="{StaticResource TextMutedBrush}"
+                                          Margin="0,4,0,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Appearance Content -->
+                <StackPanel Name="AppearanceContent" Spacing="20" IsVisible="{Binding IsAppearanceVisible}">
+                    
+                    <Border Background="{StaticResource SurfaceCardBrush}"
+                            BorderBrush="{StaticResource BorderDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="20">
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="Visual Settings" 
+                                      FontSize="18" 
+                                      FontWeight="SemiBold"
+                                      Foreground="{StaticResource TextPrimaryBrush}"/>
+                            
+                            <!-- Theme -->
+                            <Grid ColumnDefinitions="150,*">
+                                <TextBlock Grid.Column="0"
+                                          Text="Theme:"
+                                          VerticalAlignment="Center"
+                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <ComboBox Grid.Column="1"
+                                         ItemsSource="{Binding AvailableThemes}"
+                                         SelectedItem="{Binding SelectedTheme}"
+                                         Width="200"
+                                         HorizontalAlignment="Left"/>
+                            </Grid>
+
+                            <!-- Accent Color -->
+                            <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto">
+                                <TextBlock Grid.Column="0" Grid.Row="0"
+                                          Text="Accent Color:"
+                                          VerticalAlignment="Center"
+                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Spacing="8">
+                                    <TextBox Text="{Binding AccentColor}"
+                                            Width="120"/>
+                                    
+                                    <Border Width="24" Height="24"
+                                           Background="{Binding AccentColor}"
+                                           CornerRadius="4"
+                                           BorderBrush="{StaticResource BorderDefaultBrush}"
+                                           BorderThickness="1"/>
+                                </StackPanel>
+                                
+                                <ItemsControl Grid.Column="1" Grid.Row="1" 
+                                             ItemsSource="{Binding PredefinedColors}"
+                                             Margin="0,8,0,0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Width="24" Height="24"
+                                                   Background="{Binding}"
+                                                   CornerRadius="4"
+                                                   BorderBrush="{StaticResource BorderDefaultBrush}"
+                                                   BorderThickness="1"
+                                                   Margin="0,0,4,4"
+                                                   Command="{Binding $parent[UserControl].DataContext.SelectColorCommand}"
+                                                   CommandParameter="{Binding}"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+
+                            <!-- Visual Effects -->
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Visual Effects"
+                                          FontSize="16"
+                                          FontWeight="SemiBold"
+                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <CheckBox Content="Enable animations"
+                                         IsChecked="{Binding EnableAnimations}"
+                                         Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <CheckBox Content="Enable glass effects"
+                                         IsChecked="{Binding EnableGlass}"
+                                         Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <CheckBox Content="Enable progress effects"
+                                         IsChecked="{Binding EnableProgressEffects}"
+                                         Foreground="{StaticResource TextPrimaryBrush}"/>
+                                
+                                <CheckBox Content="Compact mode"
+                                         IsChecked="{Binding CompactMode}"
+                                         Foreground="{StaticResource TextPrimaryBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Import/Export Content -->
+                <StackPanel Name="ImportExportContent" Spacing="20" IsVisible="{Binding IsImportExportVisible}">
+                    
+                    <Border Background="{StaticResource SurfaceCardBrush}"
+                            BorderBrush="{StaticResource BorderDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="20">
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="Settings Management" 
+                                      FontSize="18" 
+                                      FontWeight="SemiBold"
+                                      Foreground="{StaticResource TextPrimaryBrush}"/>
+                            
+                            <TextBlock Text="Export your settings to share or backup, or import settings from another ICNX installation."
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      TextWrapping="Wrap"/>
+                            
+                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,16,0,0">
+                                <Button Content="Export Settings"
+                                       Command="{Binding ExportSettingsCommand}"
+                                       Background="{StaticResource AccentPrimaryBrush}"
+                                       Foreground="White"
+                                       Padding="20,12"/>
+                                
+                                <Button Content="Import Settings"
+                                       Command="{Binding ImportSettingsCommand}"
+                                       Background="{StaticResource SurfaceElevatedBrush}"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       Padding="20,12"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+                
+            </StackPanel>
+        </ScrollViewer>
+
+    </Grid>
+
+</UserControl>

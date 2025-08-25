@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "lig79CKclQM=",
+  "success": true,
+  "projectFilePath": "/Users/saadal-ageel/cnex-sharp/src/ICNX.Scripting/ICNX.Scripting.csproj",
+  "expectedPackageFiles": [
+    "/Users/saadal-ageel/.nuget/packages/acornima/1.2.0/acornima.1.2.0.nupkg.sha512",
+    "/Users/saadal-ageel/.nuget/packages/jint/4.4.1/jint.4.4.1.nupkg.sha512",
+    "/Users/saadal-ageel/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/9.0.8/microsoft.extensions.dependencyinjection.abstractions.9.0.8.nupkg.sha512",
+    "/Users/saadal-ageel/.nuget/packages/microsoft.extensions.logging.abstractions/9.0.8/microsoft.extensions.logging.abstractions.9.0.8.nupkg.sha512"
+  ],
+  "logs": []
+}

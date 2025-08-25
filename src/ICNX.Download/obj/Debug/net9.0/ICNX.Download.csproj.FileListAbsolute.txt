@@ -1,0 +1,15 @@
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/bin/Debug/net9.0/ICNX.Download.deps.json
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/bin/Debug/net9.0/ICNX.Download.dll
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/bin/Debug/net9.0/ICNX.Download.pdb
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/bin/Debug/net9.0/ICNX.Core.dll
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/bin/Debug/net9.0/ICNX.Core.pdb
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/obj/Debug/net9.0/ICNX.Download.csproj.AssemblyReference.cache
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/obj/Debug/net9.0/ICNX.Download.GeneratedMSBuildEditorConfig.editorconfig
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/obj/Debug/net9.0/ICNX.Download.AssemblyInfoInputs.cache
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/obj/Debug/net9.0/ICNX.Download.AssemblyInfo.cs
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/obj/Debug/net9.0/ICNX.Download.csproj.CoreCompileInputs.cache
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/obj/Debug/net9.0/ICNX.Dow.A8FBE56F.Up2Date
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/obj/Debug/net9.0/ICNX.Download.dll
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/obj/Debug/net9.0/refint/ICNX.Download.dll
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/obj/Debug/net9.0/ICNX.Download.pdb
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Download/obj/Debug/net9.0/ref/ICNX.Download.dll

@@ -1,0 +1,63 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Background Colors - Dark Theme -->
+    <Color x:Key="BackgroundPrimary">#FF1A1A2E</Color>
+    <Color x:Key="BackgroundSecondary">#FF16213E</Color>
+    <Color x:Key="BackgroundTertiary">#FF0F1419</Color>
+    
+    <!-- Surface Colors with Glass Effects -->
+    <Color x:Key="SurfaceBase">#FF2A2D3A</Color>
+    <Color x:Key="SurfaceElevated">#FF3A3D4A</Color>
+    <Color x:Key="SurfaceGlass">#4D2A2D3A</Color>
+    <Color x:Key="SurfaceCard">#8A2A2D3A</Color>
+    
+    <!-- Accent Colors - Vibrant Blues and Purples -->
+    <Color x:Key="AccentPrimary">#FF3B82F6</Color>
+    <Color x:Key="AccentSecondary">#FF6366F1</Color>
+    <Color x:Key="AccentTertiary">#FF8B5CF6</Color>
+    
+    <!-- Gradient Colors -->
+    <Color x:Key="GradientStart">#FF6366F1</Color>
+    <Color x:Key="GradientMiddle">#FF8B5CF6</Color>
+    <Color x:Key="GradientEnd">#FFEC4899</Color>
+    
+    <!-- Semantic Colors -->
+    <Color x:Key="Success">#FF22C55E</Color>
+    <Color x:Key="Warning">#FFEAB308</Color>
+    <Color x:Key="Error">#FFEF4444</Color>
+    <Color x:Key="Info">#FF06B6D4</Color>
+    
+    <!-- Text Colors -->
+    <Color x:Key="TextPrimary">#FFF1F5F9</Color>
+    <Color x:Key="TextSecondary">#FFCBD5E1</Color>
+    <Color x:Key="TextMuted">#FF94A3B8</Color>
+    <Color x:Key="TextDisabled">#FF64748B</Color>
+    
+    <!-- Border Colors -->
+    <Color x:Key="BorderDefault">#FF243041</Color>
+    <Color x:Key="BorderElevated">#FF374151</Color>
+    <Color x:Key="BorderFocus">#FF3B82F6</Color>
+    
+    <!-- Shadow Colors -->
+    <Color x:Key="ShadowLight">#40000000</Color>
+    <Color x:Key="ShadowMedium">#60000000</Color>
+    <Color x:Key="ShadowDark">#80000000</Color>
+    
+    <!-- Hover and Interactive States -->
+    <Color x:Key="HoverOverlay">#20FFFFFF</Color>
+    <Color x:Key="PressedOverlay">#30FFFFFF</Color>
+    <Color x:Key="SelectedOverlay">#40FFFFFF</Color>
+    
+    <!-- Progress Colors -->
+    <Color x:Key="ProgressTrack">#FF374151</Color>
+    <Color x:Key="ProgressFillStart">#FF3B82F6</Color>
+    <Color x:Key="ProgressFillEnd">#FF2563EB</Color>
+    
+    <!-- Notification Colors -->
+    <Color x:Key="NotificationSuccess">#2222C55E</Color>
+    <Color x:Key="NotificationWarning">#22EAB308</Color>
+    <Color x:Key="NotificationError">#22EF4444</Color>
+    <Color x:Key="NotificationInfo">#2206B6D4</Color>
+
+</ResourceDictionary>

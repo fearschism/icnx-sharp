@@ -1,0 +1,15 @@
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/bin/Debug/net9.0/ICNX.Persistence.deps.json
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/bin/Debug/net9.0/ICNX.Persistence.dll
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/bin/Debug/net9.0/ICNX.Persistence.pdb
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/bin/Debug/net9.0/ICNX.Core.dll
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/bin/Debug/net9.0/ICNX.Core.pdb
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/obj/Debug/net9.0/ICNX.Persistence.csproj.AssemblyReference.cache
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/obj/Debug/net9.0/ICNX.Persistence.GeneratedMSBuildEditorConfig.editorconfig
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/obj/Debug/net9.0/ICNX.Persistence.AssemblyInfoInputs.cache
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/obj/Debug/net9.0/ICNX.Persistence.AssemblyInfo.cs
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/obj/Debug/net9.0/ICNX.Persistence.csproj.CoreCompileInputs.cache
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/obj/Debug/net9.0/ICNX.Per.FB53D04C.Up2Date
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/obj/Debug/net9.0/ICNX.Persistence.dll
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/obj/Debug/net9.0/refint/ICNX.Persistence.dll
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/obj/Debug/net9.0/ICNX.Persistence.pdb
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Persistence/obj/Debug/net9.0/ref/ICNX.Persistence.dll

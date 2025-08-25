@@ -1,0 +1,246 @@
+ICNX C# CROSS-PLATFORM DESKTOP PROMPT
+
+You are an expert assistant helping redesign and port ICNX (currently Tauri + React + Rust) into a pure C# solution for cross‑platform desktop (Windows, macOS, Linux) with future potential for mobile reuse only if needed (deferred). Focus on performance, maintainability, and parity with existing features: quick downloads, scripted scraping, session/history DB, pause/resume/cancel, progress UI, script system.
+
+PRIMARY GOAL
+- Build a single .NET 8+ solution delivering native-feeling UI, efficient async downloads, and extensible scripting.
+
+UI STACK OPTIONS (SELECT ONE)
+1. Avalonia UI
+   Pros: Mature cross-platform desktop (Win/macOS/Linux), XAML-like, theming, good tooling.
+   Cons: Mobile support experimental; need custom control tweaks.
+2. .NET MAUI (Desktop focus)
+   Pros: Official; potential mobile reuse.
+   Cons: Desktop polish behind Avalonia; macOS tooling heavier; Linux unsupported (community only).
+3. Uno Platform
+   Pros: WinUI XAML parity; WebAssembly fallback.
+   Cons: Complexity; performance overhead on WASM not needed.
+
+RECOMMENDED: Avalonia UI for consistent desktop coverage including Linux.
+
+SOLUTION STRUCTURE (PROPOSED)
+ICNX.sln
+  ICNX.App           (Avalonia UI layer: Views, ViewModels, DI bootstrapping)
+  ICNX.Core          (Domain models, services interfaces, status enums)
+  ICNX.Download      (Downloader engine: HTTP, concurrency, resume)
+  ICNX.Scripting     (Script engine: JavaScript or C# plugin host)
+  ICNX.Persistence   (SQLite Data Layer + Migrations)
+  ICNX.Interop       (Platform abstractions: open file, notifications)
+  ICNX.Tests         (Unit + Integration tests)
+
+NuGet DEPENDENCIES (CANDIDATES)
+- HTTP / Downloads: HttpClient + SocketsHttpHandler tuning OR Flurl.Http; for advanced multi-connection consider custom HttpClient usage.
+- SQLite ORM: Dapper (lightweight) or EF Core (heavier). Recommend Dapper + hand migrations for performance.
+- JSON: System.Text.Json.
+- JavaScript Engine (optional): Jint (embedded JS) or ClearScript (if full V8 needed, heavier).
+- DI: Microsoft.Extensions.DependencyInjection.
+- Logging: Microsoft.Extensions.Logging + Serilog sink.
+- Reactive / MVVM Helpers: CommunityToolkit.Mvvm OR ReactiveUI (choose one; recommend Toolkit for simplicity).
+- Async scheduling: System.Threading.Channels for internal work queues.
+
+UI (ICNX.App)
+MVVM: ViewModels expose ObservableCollection / ReadOnlyObservableCollection.
+Views: Avalonia XAML (DownloadCardView, QuickDownloadView, HistoryView, SessionDetailView, ScriptPickerDialog, SettingsView).
+DownloadCard Features: Title • Status, progress bar, buttons (Pause/Resume, Open Folder, Cancel). Bind commands to SessionManager.
+Navigation: Simple tab control (Quick, History, Scripts, Settings).
+Theming: Recreate existing dark / translucent aesthetic:
+  - Base Background: near-black gradient (#0e1116 -> #111827) or solid #111827.
+  - Layered Surfaces: surface0 #161b22 (solid), surface1 rgba(255,255,255,0.04)+blur(6px), surface2 rgba(255,255,255,0.06)+border #243041.
+  - Primary Accent: #3b82f6 (hover darken 6%, press 12%). Secondary Accent (script context): #6366f1.
+  - Semantic Colors: Success #22c55e, Warning/Mixed #eab308, Paused #f59e0b, Error #ef4444, Neutral #64748b.
+  - Text: Primary #f1f5f9, Secondary #cbd5e1, Muted #94a3b8, Disabled #64748b.
+  - Borders: subtle 1px #243041; avoid heavy outlines; use focus ring for accessibility.
+  - Elevation Shadows: rgba(0,0,0,0.4) 0 4px 12px -2px.
+  - Radius Scale: Cards 8px, Buttons 6px, Badges 4px.
+  - Progress Bar: gradient fill (#3b82f6 -> #2563eb) with optional animated sheen every 4s (toggleable in settings).
+  - Status Badges: pill (h=18px) translucent bg (e.g., success rgba(34,197,94,0.15)) + 1px border in color at 60% opacity.
+  - Focus Ring: 2px outer #3b82f6 + 1px inner #1e293b; ensure keyboard discoverability.
+  - Reduced Effects Mode: disable blur & sheen; flatten shadows; for low-power or accessibility preference.
+  - Compact Mode: reduce internal paddings ~25% while preserving min hit targets (32px) for controls.
+  - Glass Layers: Use Acrylic-like composition: back layer blur radius 12px + desaturation 15% + luminosity blend; front card overlay rgba(16,21,28,0.55) with subtle noise texture (PNG alpha <4%) to prevent banding.
+  - Breathing Effects: Very subtle scale/opacity loop for primary focus element (e.g., active session chip) scale 1.0 -> 1.015 -> 1.0 over 6s cubic-bezier(0.4,0,0.2,1) with 2s initial delay. Disable automatically when user interacts or ReducedEffects=true.
+  - Breathing Progress Halo: Optional radial glow pulse (opacity 0.25 -> 0.4 -> 0.25) synced every 5s behind active download card accent border.
+  - Performance Guard: Detect GPU tier (basic heuristic: first frame render time) and auto-disable glass/breathing if threshold > 32ms average over first 120 frames.
+  - User Toggles: Appearance.EnableGlass (default true desktop), Appearance.EnableBreathing (default true), Appearance.EnableProgressHalo (default false). Mobile (future) defaults all false.
+Implementation: ResourceDictionaries (Colors.axaml, Brushes.axaml, Styles.axaml). IThemeService toggles Dark (default), HighContrast, ReducedEffects, CompactMode.
+
+CORE DOMAIN MODELS (ICNX.Core)
+DownloadSession { Id (Guid/string), CreatedAt, Title, Status (enum), TotalBytes?, CompletedCount, FailedCount, CancelledCount }
+DownloadItem { Id, SessionId, Url, Filename, Status, Mime?, TotalBytes?, DownloadedBytes, Error?, StartedAt?, CompletedAt? }
+ProgressUpdate { SessionId, ItemId, Status, DownloadedBytes, TotalBytes?, SpeedBytesPerSec?, EtaMs?, Error? }
+ScriptInfo { Name, Version, Description, Pattern, CreatedAt }
+ScrapeResult { Id, ScriptName, Url, Title?, DataJson, CreatedAt }
+Settings { DefaultDownloadDir, Concurrency, RetryLimit (legacy cap), AutoResumeOnLaunch, RetryPolicy, Appearance }
+RetryPolicy { Enabled (bool=true), MaxAttempts (int=5), BaseDelayMs (int=1000), BackoffFactor (double=2.0), JitterPct (0.2), RetryStatusCodes [408,429,500,502,503,504], PerItemResetOnProgress (bool=true) }
+Appearance { EnableAnimations (bool=true), ReducedEffects (bool=false), CompactMode (bool=false), EnableProgressSheen (bool=true) }
+
+STATUS ENUM
+Queued, Started, Downloading, Paused, Resumed, Completed, Failed, Cancelled
+
+DATABASE SCHEMA (SQLite)
+Tables: download_sessions, download_items, scripts, scrape_results, settings (single row), migrations.
+Migrations table tracks applied numeric versions.
+
+PERSISTENCE LAYER (ICNX.Persistence)
+- MigrationRunner (ensure on startup)
+- Repositories: DownloadSessionRepo, DownloadItemRepo, ScriptRepo, ScrapeResultRepo, SettingsRepo
+- Batched writes: Use transaction for groups of related updates (e.g., progress snapshot every X secs or Y% delta).
+
+DOWNLOADER ENGINE (ICNX.Download)
+Responsibilities:
+- Accept StartSession(List<DownloadRequest>, destinationPath, concurrency)
+- Manage per-session CancellationTokenSource & Pause flag (volatile / Interlocked)
+- Use bounded Channel<DownloadItemWork> for concurrency
+- Each worker: stream response via HttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead), copy stream to temp file (.part), update metrics.
+- Emit ProgressUpdate events (IObservable or event aggregator) on: queued, started, periodic progress (e.g., at least 250ms or 1% delta), paused (heartbeat every 3s), resumed, completed, failed, cancelled.
+- Resume support: If paused mid-file and server Accept-Ranges, store downloaded length and reissue request with Range header.
+- Cancel: CTS.Cancel, remove partial file, mark statuses.
+- ForceCancel: Immediately dispose streams, drop queue, finalize statuses.
+
+SCRIPTING ENGINE (ICNX.Scripting)
+Option A (JS via Jint):
+- Load manifest (JSON) -> ScriptInfo.
+- Detect by regex/path pattern match.
+- Provide ExecutionContext { InputUrl, Settings, Logger, EnqueueDownload(url, filename?) }.
+- Limit runtime/time: set max statements or Timeout.
+Option B (C# plugin):
+- Interface IScraperPlugin { bool Matches(string url); Task<ScrapeResult[]> RunAsync(string url, CancellationToken); }
+- Load assemblies from /scripts folder with sandbox (ReflectionOnly load + restricted permission—not full AppDomain sandbox in .NET 8, but can approximate restrictions by design).
+
+EVENT AGGREGATION
+Use IProgress<ProgressUpdate> or custom IEventBus with typed events:
+- DownloadSessionStarted, DownloadSessionFinished, DownloadItemUpdated, ScriptDetected, ScriptRunStarted, ScriptRunFinished, ToastRequested.
+UI subscribes through Reactive commands or Observable streams.
+
+GLOBAL STATE REPLACEMENT
+SessionManager singleton (scoped) maintains active sessions dictionary.
+ProgressDispatcher updates an in-memory cache (ConcurrentDictionary<(SessionId,ItemId), ProgressUpdate>) for quick lookup.
+
+LOGGING
+Prefix log lines with category ICNX.Download / ICNX.Script / ICNX.DB.
+Log lifecycle transitions with sessionId+itemId.
+Structured log properties for filtering.
+
+SETTINGS
+Persist JSON or table; expose strongly-typed SettingsStore with change notifications.
+Add JSON blob for RetryPolicy + Appearance. Validate: MaxAttempts 0..20, BackoffFactor 1..5, JitterPct 0..0.5, BaseDelayMs 200..10000. Hot reload policies for in-flight retries.
+
+PAUSE / RESUME LOGIC
+- Pause: set flag; workers stop reading (break after finishing current buffer), flush snapshot, emit Paused.
+- Resume: enqueue remaining items or continue partial item with Range header; emit Resumed then next Downloading update.
+
+HISTORY DERIVATION
+Session status calculation:
+- All Completed => Completed
+- Any Failed & none Active => Failed (or Mixed if mix completed+failed)
+- Any Cancelled & others completed => Mixed
+- Any Active => InProgress
+
+MIGRATION FROM CURRENT VERSION
+1. Export existing SQLite schema & map columns to new models.
+2. Importer tool to JSON -> new DB.
+3. Validate sample parity.
+4. Migration #2: create settings table (id TEXT PK) with settings_json column seeded with defaults.
+
+SCRIPT DETECTION FLOW
+QuickDownloadViewModel.OnUrlChanged -> ScriptDetectorService.GetMatches(url) -> returns list -> if exactly one auto-run else show dialog.
+
+PERFORMANCE OPTIMIZATIONS
+- Reuse HttpClient per host.
+- Use ArrayPool<byte> for buffer (64KB default adjustable).
+- Only write DB progress snapshot every 1s or >=1% delta.
+- Use AsyncFileStream with preallocation if content-length known.
+
+TEST STRATEGY
+Unit: Status transitions, pause/resume, cancel, retry logic.
+Integration: Local in-memory HTTP server (e.g., WireMock.Net or test server) for redirects, partial content, failures.
+Script Engine: Mock scripts capturing deterministic outputs.
+UI: Avalonia.Headless tests for Command binding and ViewModel updates.
+
+EDGE CASES
+- Unknown length streams (no Content-Length) -> show indeterminate progress.
+- 0-byte file -> immediate completion.
+- Duplicate filename -> append numeric suffix.
+- Disk full -> catch IOException early, mark Failed, emit error.
+- Network interruption -> retry (exponential up to RetryLimit) then mark Failed.
+- Pause during DNS/SSL negotiation -> should still respect CTS.
+
+RETRY POLICY
+TransientStatusCodes: 408, 429, 500, 502, 503, 504.
+Backoff: base 1s * 2^attempt (cap 30s) + jitter.
+Store attempt count in item state.
+User-Configurable Logic:
+ - Disabled => immediate failure after first error.
+ - Enabled => attempt until success or attempts >= MaxAttempts.
+ - Delay = min(BaseDelayMs * BackoffFactor^(attempt-1), 30000) * (1 ± rand*JitterPct).
+ - If PerItemResetOnProgress and DownloadedBytes advanced >=1% since last error, reset attempt counter.
+ - Non-Retryable: 4xx (except 408,429), fatal protocol errors.
+ - Backoff wait respects pause/cancel (CTS on Task.Delay). Pause suspends countdown; resume resumes remaining.
+Settings UI (Downloads section): toggle Enabled, slider MaxAttempts, numeric BaseDelayMs, slider BackoffFactor, slider JitterPct, advanced multi-select status codes.
+
+PUBLIC SERVICE INTERFACES (ABBREVIATED)
+IDownloadSessionService {
+  Task<string> StartAsync(IEnumerable<DownloadRequest> items, string destination, int? concurrency = null);
+  Task PauseAsync(string sessionId);
+  Task ResumeAsync(string sessionId);
+  Task CancelAsync(string sessionId, bool force = false);
+  IAsyncEnumerable<ProgressUpdate> StreamSession(string sessionId, CancellationToken ct);
+  Task<DownloadSession?> GetSessionAsync(string sessionId);
+  Task<IEnumerable<DownloadSession>> GetRecentSessionsAsync(int limit);
+}
+
+IScriptService {
+  Task<IEnumerable<ScriptInfo>> DetectAsync(string url);
+  Task RunScriptAsync(string scriptName, ScriptRunOptions options);
+}
+
+HARDENING & SECURITY
+- Validate download URLs (avoid file:/// & local network if restricted mode enabled).
+- Limit script execution time / memory (Jint Engine constraints).
+- Sanitize filenames (remove path separators, control chars).
+
+OBSERVABILITY
+- Optional OpenTelemetry exporter (later) for timings.
+- Provide verbose debug toggle writing detailed per-chunk log at trace level.
+
+BUILD & PACKAGING
+- Windows: MSIX or self-contained exe.
+- macOS: .app bundle (codesign + notarize pipeline later).
+- Linux: .deb/.rpm/AppImage using dotnet publish + fpm or appimagetool.
+
+REQUEST TEMPLATE
+Goal:
+Current Behavior:
+Desired Behavior:
+Affected Layers (UI/Core/Download/Persistence/Scripting):
+Data Model Changes:
+Edge Cases:
+Acceptance Criteria:
+Tests:
+
+EXAMPLE AI PROMPT
+You are assisting with ICNX (Avalonia + .NET 8). Implement <FEATURE>. Update services: <list>. Modify DB schema (migration #). Provide focused diffs only. Ensure analyzer clean, tests for status transitions. List verification steps.
+
+FUTURE ENHANCEMENTS
+- Multi-source segmented downloads.
+- Checksum/Signature verification.
+- Plugin marketplace (discovery + trust model).
+- Background service mode (headless) + tray integration.
+- Notification center with aggregated session summaries.
+- Adaptive accent color from OS (ensure contrast).
+
+DONE DEFINITION
+1. All unit/integration tests pass.
+2. dotnet build yields no warnings for touched projects.
+3. Feature works across Win/macOS/Linux smoke tests.
+4. DB migrations applied idempotently.
+5. Logging sufficient for post-mortem (sessionId/itemId correlation).
+
+INSTRUCTIONS TO AI
+- Read this file fully first.
+- Make at most 1–2 assumptions; state them.
+- Avoid unrelated refactors.
+- Provide rationale for nontrivial design choices.
+- Tag new logs with prefix ICNX:.
+
+<END OF C# PROMPT>

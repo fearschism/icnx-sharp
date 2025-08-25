@@ -1,0 +1,112 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:services="using:ICNX.App.Services"
+             x:Class="ICNX.App.Views.Controls.ToastNotificationPanel"
+             x:DataType="services:ToastNotificationService">
+
+    <ItemsControl ItemsSource="{Binding Notifications}" 
+                  VerticalAlignment="Top" 
+                  HorizontalAlignment="Right"
+                  Margin="24">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="services:ToastNotification">
+                <Border Background="{StaticResource SurfaceCardBrush}"
+                        BorderBrush="{StaticResource BorderDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,8"
+                        Width="320"
+                        IsVisible="{Binding IsVisible}">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#80000000" 
+                                          OffsetX="0" OffsetY="4" 
+                                          BlurRadius="12" 
+                                          Opacity="0.3"/>
+                    </Border.Effect>
+                    
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <!-- Icon -->
+                        <Border Grid.Column="0" 
+                                Background="{Binding TypeColor}"
+                                CornerRadius="16"
+                                Width="32" Height="32"
+                                Margin="0,0,12,0">
+                            <TextBlock Text="{Binding TypeIcon}"
+                                       FontSize="16"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="White"/>
+                        </Border>
+                        
+                        <!-- Content -->
+                        <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Title}"
+                                       FontWeight="SemiBold"
+                                       FontSize="14"
+                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="{Binding Message}"
+                                       FontSize="12"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                        
+                        <!-- Close Button -->
+                        <Button Grid.Column="2"
+                                Width="20" Height="20"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                CornerRadius="10"
+                                VerticalAlignment="Top"
+                                Command="{Binding $parent[UserControl].DataContext.RemoveNotificationCommand}"
+                                CommandParameter="{Binding}">
+                            <TextBlock Text="✕" 
+                                       FontSize="10" 
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       HorizontalAlignment="Center"/>
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                    </Grid>
+                    
+                    <!-- Slide in animation -->
+                    <Border.Styles>
+                        <Style Selector="Border">
+                            <Style.Animations>
+                                <Animation Duration="0:0:0.3" FillMode="Forward">
+                                    <KeyFrame Cue="0%">
+                                        <Setter Property="Opacity" Value="0"/>
+                                        <Setter Property="TranslateTransform.X" Value="100"/>
+                                    </KeyFrame>
+                                    <KeyFrame Cue="100%">
+                                        <Setter Property="Opacity" Value="1"/>
+                                        <Setter Property="TranslateTransform.X" Value="0"/>
+                                    </KeyFrame>
+                                </Animation>
+                            </Style.Animations>
+                        </Style>
+                        
+                        <Style Selector="Border[IsVisible=False]">
+                            <Style.Animations>
+                                <Animation Duration="0:0:0.3" FillMode="Forward">
+                                    <KeyFrame Cue="0%">
+                                        <Setter Property="Opacity" Value="1"/>
+                                        <Setter Property="TranslateTransform.X" Value="0"/>
+                                    </KeyFrame>
+                                    <KeyFrame Cue="100%">
+                                        <Setter Property="Opacity" Value="0"/>
+                                        <Setter Property="TranslateTransform.X" Value="100"/>
+                                    </KeyFrame>
+                                </Animation>
+                            </Style.Animations>
+                        </Style>
+                    </Border.Styles>
+                </Border>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+</UserControl>

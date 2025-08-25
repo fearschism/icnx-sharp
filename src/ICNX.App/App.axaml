@@ -1,0 +1,193 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:ICNX.App.Converters"
+             x:Class="ICNX.App.App"
+             Name="ICNX"
+             RequestedThemeVariant="Dark">
+
+  <Application.Resources>
+    <!-- Value Converters -->
+    <conv:StatusToBrushConverter x:Key="StatusToBrushConverter"/>
+    <conv:ProgressToWidthConverter x:Key="ProgressToWidthConverter"/>
+    <conv:StringNotEmptyConverter x:Key="StringNotEmptyConverter"/>
+    <conv:StatusToCompletedConverter x:Key="StatusToCompletedConverter"/>
+    <conv:StatusToFailedConverter x:Key="StatusToFailedConverter"/>
+    <conv:StatusToActiveConverter x:Key="StatusToActiveConverter"/>
+    <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    
+    <!-- Essential Colors -->
+    <Color x:Key="BackgroundPrimary">#FF1A1A2E</Color>
+    <Color x:Key="BackgroundSecondary">#FF16213E</Color>
+    <Color x:Key="SurfaceBase">#FF2A2D3A</Color>
+    <Color x:Key="SurfaceElevated">#FF3A3D4A</Color>
+    <Color x:Key="AccentPrimary">#FF3B82F6</Color>
+    <Color x:Key="GradientStart">#FF6366F1</Color>
+    <Color x:Key="GradientMiddle">#FF8B5CF6</Color>
+    <Color x:Key="GradientEnd">#FFEC4899</Color>
+    <Color x:Key="TextPrimary">#FFF1F5F9</Color>
+    <Color x:Key="TextSecondary">#FFCBD5E1</Color>
+    <Color x:Key="TextMuted">#FF94A3B8</Color>
+    <Color x:Key="BorderDefault">#FF243041</Color>
+    <Color x:Key="BorderElevated">#FF374151</Color>
+    <Color x:Key="BorderFocus">#FF3B82F6</Color>
+    
+    <!-- Essential Brushes -->
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMuted}"/>
+    <SolidColorBrush x:Key="SurfaceBaseBrush" Color="{StaticResource SurfaceBase}"/>
+    <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="{StaticResource SurfaceElevated}"/>
+    <SolidColorBrush x:Key="SurfaceGlassBrush" Color="#4D2A2D3A"/>
+    <SolidColorBrush x:Key="BorderDefaultBrush" Color="{StaticResource BorderDefault}"/>
+    <SolidColorBrush x:Key="BorderElevatedBrush" Color="{StaticResource BorderElevated}"/>
+    <SolidColorBrush x:Key="BorderFocusBrush" Color="{StaticResource BorderFocus}"/>
+    <SolidColorBrush x:Key="AccentPrimaryBrush" Color="{StaticResource AccentPrimary}"/>
+    <SolidColorBrush x:Key="HoverOverlayBrush" Color="#20FFFFFF"/>
+    <SolidColorBrush x:Key="SelectedOverlayBrush" Color="#40FFFFFF"/>
+    
+    <!-- Gradient Brushes -->
+    <LinearGradientBrush x:Key="BackgroundGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+      <GradientStop Color="{StaticResource BackgroundPrimary}" Offset="0"/>
+      <GradientStop Color="{StaticResource BackgroundSecondary}" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="HeaderGlassBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+      <GradientStop Color="#802A2D3A" Offset="0"/>
+      <GradientStop Color="#402A2D3A" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="ProgressGradientBrush" StartPoint="0%,0%" EndPoint="100%,0%">
+      <GradientStop Color="{StaticResource AccentPrimary}" Offset="0"/>
+      <GradientStop Color="#FF2563EB" Offset="1"/>
+    </LinearGradientBrush>
+  </Application.Resources>
+  
+  <Application.Styles>
+    <FluentTheme>
+      <FluentTheme.Palettes>
+        <ColorPaletteResources x:Key="Dark" Accent="#FF3B82F6" AltHigh="Black" AltLow="Black" AltMedium="Black" AltMediumHigh="Black" AltMediumLow="Black" BaseHigh="White" BaseLow="#FF33373D" BaseMedium="#FF9A9A9A" BaseMediumHigh="#FFB4B4B4" BaseMediumLow="#FF676767" ChromeAltLow="#FFB4B4B4" ChromeBlackHigh="Black" ChromeBlackLow="#FFB4B4B4" ChromeBlackMedium="Black" ChromeBlackMediumLow="Black" ChromeDisabledHigh="#FF333333" ChromeDisabledLow="#FF858585" ChromeGray="#FFA19F9D" ChromeHigh="#FF767676" ChromeLow="#FF171717" ChromeMedium="#FF1D1D1D" ChromeMediumLow="#FF2F2F2F" ChromeWhite="White" ListLow="#FF19191A" ListMedium="#FF404040" RegionColor="#FF1A1A2E"/>
+      </FluentTheme.Palettes>
+    </FluentTheme>
+    
+    <!-- Application-wide base styles -->
+    <Style Selector="Window">
+      <Setter Property="Background" Value="{StaticResource BackgroundGradientBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+      <Setter Property="FontFamily" Value="Segoe UI,Helvetica Neue,Arial,sans-serif"/>
+    </Style>
+    
+    <Style Selector="UserControl">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+
+    <!-- Override default button styles -->
+    <Style Selector="Button">
+      <Setter Property="Background" Value="{StaticResource SurfaceGlassBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="Padding" Value="12,8"/>
+      <Setter Property="FontWeight" Value="Medium"/>
+    </Style>
+
+    <Style Selector="Button:pointerover">
+      <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource BorderElevatedBrush}"/>
+    </Style>
+
+    <Style Selector="Button:pressed">
+      <Setter Property="Background" Value="{StaticResource SurfaceBaseBrush}"/>
+    </Style>
+
+    <!-- TextBox overrides -->
+    <Style Selector="TextBox">
+      <Setter Property="Background" Value="{StaticResource SurfaceGlassBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="Padding" Value="10,8"/>
+    </Style>
+
+    <Style Selector="TextBox:focus">
+      <Setter Property="BorderBrush" Value="{StaticResource BorderFocusBrush}"/>
+    </Style>
+
+    <!-- ProgressBar overrides -->
+    <Style Selector="ProgressBar">
+      <Setter Property="Background" Value="{StaticResource SurfaceBaseBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource ProgressGradientBrush}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CornerRadius" Value="4"/>
+      <Setter Property="Height" Value="6"/>
+    </Style>
+
+    <!-- TabControl overrides -->
+    <Style Selector="TabControl">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style Selector="TabItem">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+      <Setter Property="BorderThickness" Value="0,0,0,2"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="Padding" Value="16,12"/>
+      <Setter Property="FontWeight" Value="Medium"/>
+    </Style>
+
+    <Style Selector="TabItem:selected">
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource AccentPrimaryBrush}"/>
+    </Style>
+
+    <Style Selector="TabItem:pointerover">
+      <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+    </Style>
+
+    <!-- ListBox overrides -->
+    <Style Selector="ListBox">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style Selector="ListBoxItem">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Margin" Value="0"/>
+    </Style>
+
+    <Style Selector="ListBoxItem:selected">
+      <Setter Property="Background" Value="{StaticResource SelectedOverlayBrush}"/>
+    </Style>
+
+    <Style Selector="ListBoxItem:pointerover">
+      <Setter Property="Background" Value="{StaticResource HoverOverlayBrush}"/>
+    </Style>
+
+    <!-- ScrollViewer overrides -->
+    <Style Selector="ScrollViewer">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
+    <Style Selector="ScrollBar">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
+    <Style Selector="ScrollBar:horizontal Thumb">
+      <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+      <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+
+    <Style Selector="ScrollBar:vertical Thumb">
+      <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+      <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+
+  </Application.Styles>
+
+</Application>

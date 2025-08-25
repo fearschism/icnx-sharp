@@ -1,0 +1,95 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Simple Glass Card Style -->
+    <ControlTheme x:Key="GlassCardTheme" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource CardGlassBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="20"/>
+        <Setter Property="Margin" Value="8"/>
+    </ControlTheme>
+
+    <!-- Feature Card Style -->
+    <ControlTheme x:Key="FeatureCardTheme" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource AccentGradientBrush}"/>
+        <Setter Property="CornerRadius" Value="16"/>
+        <Setter Property="Padding" Value="24"/>
+        <Setter Property="Margin" Value="12"/>
+    </ControlTheme>
+
+    <!-- Primary Button Theme -->
+    <ControlTheme x:Key="PrimaryButtonTheme" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource AccentPrimaryBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="16,10"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="MinHeight" Value="40"/>
+    </ControlTheme>
+
+    <!-- Secondary Button Theme -->
+    <ControlTheme x:Key="SecondaryButtonTheme" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource SurfaceGlassBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="16,10"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="MinHeight" Value="40"/>
+    </ControlTheme>
+
+    <!-- Text Themes -->
+    <ControlTheme x:Key="HeadingTheme" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="Margin" Value="0,0,0,16"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="SubheadingTheme" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="Margin" Value="0,0,0,12"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="BodyTheme" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="CaptionTheme" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+    </ControlTheme>
+
+    <!-- Modern Progress Bar Theme -->
+    <ControlTheme x:Key="ModernProgressBarTheme" TargetType="ProgressBar">
+        <Setter Property="Background" Value="{StaticResource SurfaceBaseBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource ProgressGradientBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Height" Value="8"/>
+    </ControlTheme>
+
+    <!-- Modern TextBox Theme -->
+    <ControlTheme x:Key="ModernTextBoxTheme" TargetType="TextBox">
+        <Setter Property="Background" Value="{StaticResource SurfaceGlassBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="12,10"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="MinHeight" Value="40"/>
+    </ControlTheme>
+
+</ResourceDictionary>

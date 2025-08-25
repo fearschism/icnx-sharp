@@ -1,0 +1,245 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ICNX.App.ViewModels"
+        xmlns:ctrl="using:ICNX.App.Views.Controls"
+        xmlns:views="using:ICNX.App.Views"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+        x:Class="ICNX.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="ICNX - Cross-Platform Download Manager"
+        MinWidth="900" MinHeight="650"
+        Background="{StaticResource BackgroundGradientBrush}">
+
+    <!-- Main Grid with Sidebar and Content -->
+    <Grid ColumnDefinitions="60,*">
+        
+        <!-- Sidebar -->
+        <Border Grid.Column="0" 
+                Background="{StaticResource HeaderGlassBrush}" 
+                BorderThickness="0,0,1,0"
+                BorderBrush="{StaticResource BorderDefaultBrush}">
+            <StackPanel Spacing="8" Margin="0,16">
+                
+                <!-- Download Icon -->
+                <Button Name="DownloadButton"
+                        Width="44" Height="44"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        Margin="8,0"
+                        Click="OnSidebarButtonClick"
+                        Tag="0"
+                        ToolTip.Tip="Quick Download">
+                    <TextBlock Text="⬇" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="{StaticResource SurfaceGlassBrush}"/>
+                        </Style>
+                        <Style Selector="Button.selected">
+                            <Setter Property="Background" Value="#4D6366F1"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+                
+                <!-- History Icon -->
+                <Button Name="HistoryButton"
+                        Width="44" Height="44"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        Margin="8,0"
+                        Click="OnSidebarButtonClick"
+                        Tag="1"
+                        ToolTip.Tip="Download History">
+                    <TextBlock Text="📋" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="{StaticResource SurfaceGlassBrush}"/>
+                        </Style>
+                        <Style Selector="Button.selected">
+                            <Setter Property="Background" Value="#4D6366F1"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+                
+                <!-- Settings Icon -->
+                <Button Name="SettingsButton"
+                        Width="44" Height="44"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        Margin="8,0"
+                        Click="OnSidebarButtonClick"
+                        Tag="2"
+                        ToolTip.Tip="Settings">
+                    <TextBlock Text="⚙" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="{StaticResource SurfaceGlassBrush}"/>
+                        </Style>
+                        <Style Selector="Button.selected">
+                            <Setter Property="Background" Value="#4D6366F1"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+                
+            </StackPanel>
+        </Border>
+        
+        <!-- Main Content Area -->
+        <Grid Grid.Column="1">
+            
+            <!-- Quick Download Content -->
+            <ScrollViewer Name="QuickDownloadContent" Padding="24" IsVisible="{Binding IsQuickDownloadVisible}">
+                <StackPanel Spacing="24" MaxWidth="700">
+                    
+                    <!-- Feature Card - Quick Download -->
+                    <Border Background="#602A2D3A" 
+                            CornerRadius="16" 
+                            Padding="24">
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="Quick Download" 
+                                       FontSize="24" 
+                                       FontWeight="Bold" 
+                                       Foreground="White"/>
+                            <TextBlock Text="Paste any URL and start downloading instantly with intelligent file detection and optimized performance." 
+                                       FontSize="16" 
+                                       Foreground="#E0FFFFFF" 
+                                       TextWrapping="Wrap" 
+                                       LineHeight="24"/>
+                            
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,16,0,0">
+                                <TextBox Grid.Column="0" 
+                                         Text="{Binding QuickDownloadUrl}" 
+                                         Watermark="Enter download URL here..."
+                                         Background="#40FFFFFF"
+                                         BorderBrush="#60FFFFFF"
+                                         Foreground="White"
+                                         FontSize="16"
+                                         CornerRadius="8"
+                                         Padding="16,12"
+                                         Margin="0,0,12,0"/>
+                                
+                                <Button Grid.Column="1" 
+                                        Content="Download" 
+                                        Command="{Binding StartQuickDownloadCommand}"
+                                        IsEnabled="{Binding !IsDownloading}"
+                                        Background="White"
+                                        Foreground="#6366F1"
+                                        FontWeight="Bold"
+                                        FontSize="16"
+                                        Padding="24,12"
+                                        CornerRadius="8"
+                                        BorderThickness="0">
+                                    <Button.Effect>
+                                        <DropShadowEffect Color="#80FFFFFF" 
+                                                          OffsetX="0" OffsetY="2" 
+                                                          BlurRadius="8" 
+                                                          Opacity="0.3"/>
+                                    </Button.Effect>
+                                </Button>
+                            </Grid>
+                            
+                            <!-- Loading Indicator -->
+                            <Border IsVisible="{Binding IsDownloading}" 
+                                    Background="#40000000" 
+                                    CornerRadius="8" 
+                                    Padding="16,12">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <TextBlock Text="⟳" FontSize="16" Foreground="White"/>
+                                    <TextBlock Text="Processing download..." 
+                                               Foreground="White" 
+                                               FontWeight="Medium"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Active Downloads Section -->
+                    <ItemsControl ItemsSource="{Binding DownloadSessions}"
+                                  IsVisible="{Binding DownloadSessions.Count}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DownloadSessionViewModel">
+                                <ctrl:DownloadSessionCard DataContext="{Binding}" Margin="0,0,0,16"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    
+                    <!-- Empty State -->
+                    <Border Background="{StaticResource SurfaceGlassBrush}" 
+                            BorderBrush="{StaticResource BorderDefaultBrush}"
+                            CornerRadius="12"
+                            Padding="20"
+                            IsVisible="{Binding !DownloadSessions.Count}">
+                        <StackPanel Spacing="16" HorizontalAlignment="Center" Margin="0,40">
+                            <TextBlock Text="📥" 
+                                       FontSize="48" 
+                                       HorizontalAlignment="Center" 
+                                       Opacity="0.5"/>
+                            <TextBlock Text="No Active Downloads" 
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       HorizontalAlignment="Center" 
+                                       Opacity="0.7"/>
+                            <TextBlock Text="Start a download using the form above" 
+                                       FontSize="14"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center" 
+                                       Opacity="0.5"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+            
+            <!-- History Content -->
+            <ScrollViewer Name="HistoryContent" Padding="24" IsVisible="{Binding IsHistoryVisible}">
+                <StackPanel Spacing="24" MaxWidth="800">
+                    
+                    <!-- History Header -->
+                    <Border Background="{StaticResource SurfaceGlassBrush}" 
+                            BorderBrush="{StaticResource BorderDefaultBrush}"
+                            CornerRadius="12"
+                            Padding="20">
+                        <StackPanel>
+                            <TextBlock Text="Download History" 
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="View and manage your completed downloads" 
+                                       FontSize="14"
+                                       Foreground="{StaticResource TextSecondaryBrush}" 
+                                       Opacity="0.7"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- History Items -->
+                    <ItemsControl ItemsSource="{Binding RecentSessions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DownloadSessionViewModel">
+                                <ctrl:DownloadSessionCard DataContext="{Binding}" Margin="0,0,0,12"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+            
+            <!-- Settings Content -->
+            <Border Name="SettingsContent" Padding="24" IsVisible="{Binding IsSettingsVisible}">
+                <views:SettingsView DataContext="{Binding SettingsViewModel}"/>
+            </Border>
+            
+        </Grid>
+        
+        <!-- Toast Notification Overlay -->
+        <ctrl:ToastNotificationPanel DataContext="{Binding ToastService}" 
+                                     Grid.ColumnSpan="2"
+                                     IsHitTestVisible="False"
+                                     ZIndex="1000"/>
+        
+    </Grid>
+
+</Window>

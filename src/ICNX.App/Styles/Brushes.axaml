@@ -1,0 +1,74 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Solid Brushes -->
+    <SolidColorBrush x:Key="BackgroundPrimaryBrush" Color="{StaticResource BackgroundPrimary}"/>
+    <SolidColorBrush x:Key="BackgroundSecondaryBrush" Color="{StaticResource BackgroundSecondary}"/>
+    <SolidColorBrush x:Key="BackgroundTertiaryBrush" Color="{StaticResource BackgroundTertiary}"/>
+    
+    <SolidColorBrush x:Key="SurfaceBaseBrush" Color="{StaticResource SurfaceBase}"/>
+    <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="{StaticResource SurfaceElevated}"/>
+    <SolidColorBrush x:Key="SurfaceGlassBrush" Color="{StaticResource SurfaceGlass}"/>
+    <SolidColorBrush x:Key="SurfaceCardBrush" Color="{StaticResource SurfaceCard}"/>
+    
+    <SolidColorBrush x:Key="AccentPrimaryBrush" Color="{StaticResource AccentPrimary}"/>
+    <SolidColorBrush x:Key="AccentSecondaryBrush" Color="{StaticResource AccentSecondary}"/>
+    <SolidColorBrush x:Key="AccentTertiaryBrush" Color="{StaticResource AccentTertiary}"/>
+    
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMuted}"/>
+    <SolidColorBrush x:Key="TextDisabledBrush" Color="{StaticResource TextDisabled}"/>
+    
+    <SolidColorBrush x:Key="BorderDefaultBrush" Color="{StaticResource BorderDefault}"/>
+    <SolidColorBrush x:Key="BorderElevatedBrush" Color="{StaticResource BorderElevated}"/>
+    <SolidColorBrush x:Key="BorderFocusBrush" Color="{StaticResource BorderFocus}"/>
+    
+    <!-- Gradient Brushes -->
+    <LinearGradientBrush x:Key="BackgroundGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="{StaticResource BackgroundPrimary}" Offset="0"/>
+        <GradientStop Color="{StaticResource BackgroundSecondary}" Offset="0.5"/>
+        <GradientStop Color="{StaticResource BackgroundTertiary}" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="AccentGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="{StaticResource GradientStart}" Offset="0"/>
+        <GradientStop Color="{StaticResource GradientMiddle}" Offset="0.5"/>
+        <GradientStop Color="{StaticResource GradientEnd}" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="AccentGradientSubtleBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="#406366F1" Offset="0"/>
+        <GradientStop Color="#408B5CF6" Offset="0.5"/>
+        <GradientStop Color="#40EC4899" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="ProgressGradientBrush" StartPoint="0%,0%" EndPoint="100%,0%">
+        <GradientStop Color="{StaticResource ProgressFillStart}" Offset="0"/>
+        <GradientStop Color="{StaticResource ProgressFillEnd}" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- Card Glass Effect Brush -->
+    <LinearGradientBrush x:Key="CardGlassBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="#602A2D3A" Offset="0"/>
+        <GradientStop Color="#403A3D4A" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- Header Glass Effect -->
+    <LinearGradientBrush x:Key="HeaderGlassBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+        <GradientStop Color="#802A2D3A" Offset="0"/>
+        <GradientStop Color="#402A2D3A" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- Notification Brushes -->
+    <SolidColorBrush x:Key="NotificationSuccessBrush" Color="{StaticResource NotificationSuccess}"/>
+    <SolidColorBrush x:Key="NotificationWarningBrush" Color="{StaticResource NotificationWarning}"/>
+    <SolidColorBrush x:Key="NotificationErrorBrush" Color="{StaticResource NotificationError}"/>
+    <SolidColorBrush x:Key="NotificationInfoBrush" Color="{StaticResource NotificationInfo}"/>
+    
+    <!-- Interactive State Brushes -->
+    <SolidColorBrush x:Key="HoverOverlayBrush" Color="{StaticResource HoverOverlay}"/>
+    <SolidColorBrush x:Key="PressedOverlayBrush" Color="{StaticResource PressedOverlay}"/>
+    <SolidColorBrush x:Key="SelectedOverlayBrush" Color="{StaticResource SelectedOverlay}"/>
+
+</ResourceDictionary>

@@ -1,0 +1,12 @@
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Core/bin/Debug/net9.0/ICNX.Core.deps.json
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Core/bin/Debug/net9.0/ICNX.Core.dll
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Core/bin/Debug/net9.0/ICNX.Core.pdb
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Core/obj/Debug/net9.0/ICNX.Core.csproj.AssemblyReference.cache
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Core/obj/Debug/net9.0/ICNX.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Core/obj/Debug/net9.0/ICNX.Core.AssemblyInfoInputs.cache
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Core/obj/Debug/net9.0/ICNX.Core.AssemblyInfo.cs
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Core/obj/Debug/net9.0/ICNX.Core.csproj.CoreCompileInputs.cache
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Core/obj/Debug/net9.0/ICNX.Core.dll
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Core/obj/Debug/net9.0/refint/ICNX.Core.dll
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Core/obj/Debug/net9.0/ICNX.Core.pdb
+/Users/saadal-ageel/cnex-sharp/src/ICNX.Core/obj/Debug/net9.0/ref/ICNX.Core.dll
