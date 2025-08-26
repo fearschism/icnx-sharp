@@ -4,8 +4,13 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ICNX.App.Services;
 using ICNX.Core.Interfaces;
 using ICNX.Core.Models;
 using Microsoft.Extensions.Logging;
@@ -18,7 +23,10 @@ namespace ICNX.App.ViewModels;
 public partial class SettingsViewModel : ViewModelBase
 {
     private readonly ISettingsService _settingsService;
+    private readonly ToastNotificationService _toastService;
+    private readonly ThemeService _themeService;
     private readonly ILogger<SettingsViewModel> _logger;
+    private bool _isInitializing = true;
 
     [ObservableProperty]
     private string _downloadDirectory = string.Empty;
@@ -84,14 +92,30 @@ public partial class SettingsViewModel : ViewModelBase
     public bool IsGeneralVisible => SelectedSettingsIndex == 0;
     public bool IsRetryVisible => SelectedSettingsIndex == 1;
     public bool IsAppearanceVisible => SelectedSettingsIndex == 2;
-    public bool IsImportExportVisible => SelectedSettingsIndex == 3;
 
     partial void OnSelectedSettingsIndexChanged(int value)
     {
         OnPropertyChanged(nameof(IsGeneralVisible));
         OnPropertyChanged(nameof(IsRetryVisible));
         OnPropertyChanged(nameof(IsAppearanceVisible));
-        OnPropertyChanged(nameof(IsImportExportVisible));
+    }
+
+    partial void OnSelectedThemeChanged(ThemeMode value)
+    {
+        if (!_isInitializing)
+        {
+            _themeService.ApplyTheme(value);
+            SaveSettingsIfChanged();
+        }
+    }
+
+    partial void OnAccentColorChanged(string value)
+    {
+        if (!_isInitializing)
+        {
+            _themeService.ApplyAccentColor(value);
+            SaveSettingsIfChanged();
+        }
     }
 
     public ObservableCollection<ThemeMode> AvailableThemes { get; } = new()
@@ -104,23 +128,52 @@ public partial class SettingsViewModel : ViewModelBase
 
     public ObservableCollection<string> PredefinedColors { get; } = new()
     {
-        "#3b82f6", "#6366f1", "#8b5cf6", "#ec4899", "#ef4444",
-        "#f59e0b", "#10b981", "#06b6d4", "#6b7280", "#374151"
+        // Blue variants
+        "#3b82f6", "#1e40af", "#0ea5e9", "#0284c7",
+        // Purple variants  
+        "#6366f1", "#8b5cf6", "#a855f7", "#7c3aed",
+        // Pink/Red variants
+        "#ec4899", "#ef4444", "#f43f5e", "#e11d48", 
+        // Green variants
+        "#10b981", "#059669", "#16a34a", "#15803d",
+        // Orange/Yellow variants
+        "#f59e0b", "#d97706", "#ea580c", "#dc2626",
+        // Neutral variants
+        "#6b7280", "#374151", "#1f2937", "#111827"
     };
 
-    public SettingsViewModel(ISettingsService settingsService, ILogger<SettingsViewModel> logger)
+    public SettingsViewModel(ISettingsService settingsService, ToastNotificationService toastService, ThemeService themeService, ILogger<SettingsViewModel> logger)
     {
         _settingsService = settingsService;
+        _toastService = toastService;
+        _themeService = themeService;
         _logger = logger;
 
         // Subscribe to settings changes
         _settingsService.SettingsChangedObservable.Subscribe(settings => OnSettingsChanged(settings));
 
-        // Track property changes for unsaved changes detection
-        // PropertyChanged += OnPropertyChanged;
-
         // Load settings
         _ = LoadSettingsAsync();
+    }
+
+    /// <summary>
+    /// Automatically save settings when they change (with debouncing)
+    /// </summary>
+    private async void SaveSettingsIfChanged()
+    {
+        if (_isInitializing) return;
+
+        try
+        {
+            var settings = CreateSettingsFromProperties();
+            await _settingsService.SaveSettingsAsync(settings);
+            _toastService.ShowSuccess("Settings Saved", "Your settings have been saved automatically");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to auto-save settings");
+            _toastService.ShowError("Save Failed", "Failed to save settings automatically");
+        }
     }
 
     [RelayCommand]
@@ -138,6 +191,7 @@ public partial class SettingsViewModel : ViewModelBase
 
             HasUnsavedChanges = false;
             StatusMessage = "Settings loaded";
+            _isInitializing = false; // Enable auto-saving
         }
         catch (Exception ex)
         {
@@ -204,22 +258,28 @@ public partial class SettingsViewModel : ViewModelBase
     {
         try
         {
-            // This would typically open a folder browser dialog
-            // For now, we'll use a simple input approach
-            StatusMessage = "Use file dialog to select download directory";
+            StatusMessage = "Opening folder selection dialog...";
 
-            // In a real implementation, you'd use:
-            // var dialog = new OpenFolderDialog();
-            // var result = await dialog.ShowAsync(parentWindow);
-            // if (result != null) { DownloadDirectory = result; }
+            var selectedFolder = await FolderPickerService.SelectDownloadFolderAsync(DownloadDirectory);
+
+            if (!string.IsNullOrEmpty(selectedFolder))
+            {
+                DownloadDirectory = selectedFolder;
+                StatusMessage = "Download directory updated";
+                _toastService.ShowSuccess("Directory Selected", $"Download directory set to: {DownloadDirectory}");
+            }
+            else
+            {
+                StatusMessage = "No directory selected";
+            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to browse for directory");
             StatusMessage = "Failed to open folder browser";
+            _toastService.ShowError("Error", "Failed to open folder browser");
         }
     }
-
     [RelayCommand]
     private async Task TestDownloadDirectoryAsync()
     {
@@ -247,24 +307,21 @@ public partial class SettingsViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
-    private async Task ExportSettingsAsync()
-    {
-        StatusMessage = "Export feature coming soon";
-        await Task.CompletedTask;
-    }
 
-    [RelayCommand]
-    private async Task ImportSettingsAsync()
-    {
-        StatusMessage = "Import feature coming soon";
-        await Task.CompletedTask;
-    }
 
     [RelayCommand]
     private void SelectColor(string color)
     {
         AccentColor = color;
+    }
+
+    [RelayCommand]
+    private void SelectTheme(string themeName)
+    {
+        if (Enum.TryParse<ThemeMode>(themeName, true, out var theme))
+        {
+            SelectedTheme = theme;
+        }
     }
 
     private void OnPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -321,6 +378,13 @@ public partial class SettingsViewModel : ViewModelBase
             CompactMode = settings.Appearance.CompactMode;
             EnableGlass = settings.Appearance.EnableGlass;
             EnableProgressEffects = settings.Appearance.EnableProgressSheen;
+
+            // Apply theme when loading settings (but only if not initializing to avoid triggering change events)
+            if (!_isInitializing)
+            {
+                _themeService.ApplyTheme(settings.Appearance.Theme);
+                _themeService.ApplyAccentColor(settings.Appearance.AccentColor);
+            }
         }
         finally
         {

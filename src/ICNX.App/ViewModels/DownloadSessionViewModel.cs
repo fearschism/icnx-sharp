@@ -56,6 +56,19 @@ public partial class DownloadSessionViewModel : ViewModelBase
 
     public string SessionId { get; }
 
+    // UI Properties
+    public string StatusColor => Status switch
+    {
+        DownloadStatus.Completed => "#FF10B981",
+        DownloadStatus.Downloading or DownloadStatus.Started => "#FF3B82F6",
+        DownloadStatus.Paused => "#FFF59E0B",
+        DownloadStatus.Failed => "#FFEF4444",
+        DownloadStatus.Cancelled => "#FF6B7280",
+        _ => "#FF8B5CF6"
+    };
+
+    public double ProgressWidth => OverallProgress;
+
     // Expose the underlying model for consumers that need full access to the session data
     public DownloadSession SessionModel => _session;
 
@@ -107,6 +120,10 @@ public partial class DownloadSessionViewModel : ViewModelBase
         CanPause = Status is DownloadStatus.Downloading or DownloadStatus.Started;
         CanResume = Status == DownloadStatus.Paused;
         CanCancel = Status is DownloadStatus.Queued or DownloadStatus.Started or DownloadStatus.Downloading or DownloadStatus.Paused;
+
+        // Notify UI properties that depend on these values
+        OnPropertyChanged(nameof(StatusColor));
+        OnPropertyChanged(nameof(ProgressWidth));
     }
 
     public void UpdateProgress(SessionProgressSummary summary)
@@ -125,6 +142,10 @@ public partial class DownloadSessionViewModel : ViewModelBase
             var speed = FormatSpeed(summary.AverageSpeed);
             StatusText = $"Downloading - {speed} ({summary.CompletedItems}/{summary.TotalItems})";
         }
+
+        // Notify UI properties that depend on these values
+        OnPropertyChanged(nameof(StatusColor));
+        OnPropertyChanged(nameof(ProgressWidth));
     }
 
     private static string FormatSpeed(double bytesPerSecond)

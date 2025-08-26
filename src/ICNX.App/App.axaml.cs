@@ -62,6 +62,7 @@ public partial class App : Application
         services.AddSingleton<UIProgressService>();
         services.AddSingleton<ToastNotificationService>();
         services.AddSingleton<ProgressAggregationService>();
+        services.AddSingleton<ThemeService>();
 
         // Database - for now using in-memory connection string
         var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ICNX", "downloads.db");
@@ -95,6 +96,22 @@ public partial class App : Application
         // Run database migrations on startup
         var migrationRunner = _serviceProvider.GetRequiredService<MigrationRunner>();
         migrationRunner.RunMigrationsAsync().GetAwaiter().GetResult();
+
+        // Apply theme from settings
+        var themeService = _serviceProvider.GetRequiredService<ThemeService>();
+        var settingsService = _serviceProvider.GetRequiredService<ISettingsService>();
+
+        try
+        {
+            var settings = settingsService.GetSettingsAsync().GetAwaiter().GetResult();
+            themeService.ApplyTheme(settings.Appearance.Theme);
+            themeService.ApplyAccentColor(settings.Appearance.AccentColor);
+        }
+        catch
+        {
+            // Fallback to default theme if settings fail to load
+            themeService.ApplyTheme(ThemeMode.Dark);
+        }
     }
 
     private void DisableAvaloniaDataAnnotationValidation()

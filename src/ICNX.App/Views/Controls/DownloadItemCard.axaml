@@ -4,8 +4,8 @@
              x:Class="ICNX.App.Views.Controls.DownloadItemCard"
              x:DataType="vm:DownloadItemViewModel">
 
-    <Border Background="{StaticResource SurfaceGlassBrush}" 
-            BorderBrush="{StaticResource BorderDefaultBrush}"
+    <Border Background="{DynamicResource SurfaceGlassBrush}" 
+            BorderBrush="{DynamicResource BorderDefaultBrush}"
             BorderThickness="1"
             CornerRadius="12"
             Padding="16"
@@ -35,13 +35,13 @@
                         <TextBlock Text="{Binding Filename}" 
                                    FontSize="14" 
                                    FontWeight="SemiBold" 
-                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
                                    TextTrimming="CharacterEllipsis"/>
                         
                         <!-- URL -->
                         <TextBlock Text="{Binding Url}" 
                                    FontSize="12" 
-                                   Foreground="{StaticResource TextMutedBrush}"
+                                   Foreground="{DynamicResource TextMutedBrush}"
                                    TextTrimming="CharacterEllipsis"
                                    MaxWidth="300"/>
                     </StackPanel>
@@ -67,7 +67,7 @@
                         Height="32" 
                         Background="Transparent"
                         BorderThickness="0"
-                        Foreground="{StaticResource TextMutedBrush}"
+                        Foreground="{DynamicResource TextMutedBrush}"
                         ToolTip.Tip="Actions"/>
             </Grid>
             
@@ -75,8 +75,8 @@
             <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" 
                          Value="{Binding Progress}"
                          Maximum="100"
-                         Background="{StaticResource SurfaceBaseBrush}"
-                         Foreground="{StaticResource ProgressGradientBrush}"
+                         Background="{DynamicResource SurfaceBaseBrush}"
+                         Foreground="{DynamicResource ProgressGradientBrush}"
                          CornerRadius="6" 
                          Height="8" 
                          Margin="0,0,0,8"/>
@@ -89,27 +89,27 @@
                            Text="{Binding ProgressText}" 
                            FontSize="12" 
                            FontWeight="Medium"
-                           Foreground="{StaticResource AccentPrimaryBrush}"/>
+                           Foreground="{DynamicResource AccentPrimaryBrush}"/>
                 
                 <!-- Size Info -->
                 <TextBlock Grid.Column="1" 
                            Text="{Binding SizeText}" 
                            FontSize="12" 
-                           Foreground="{StaticResource TextMutedBrush}"
+                           Foreground="{DynamicResource TextMutedBrush}"
                            Margin="16,0,0,0"/>
                 
                 <!-- Speed -->
                 <TextBlock Grid.Column="2" 
                            Text="{Binding SpeedText}" 
                            FontSize="12" 
-                           Foreground="{StaticResource TextMutedBrush}"
+                           Foreground="{DynamicResource TextMutedBrush}"
                            Margin="16,0,0,0"/>
                 
                 <!-- ETA -->
                 <TextBlock Grid.Column="3" 
                            Text="{Binding EtaText}" 
                            FontSize="12" 
-                           Foreground="{StaticResource TextMutedBrush}"
+                           Foreground="{DynamicResource TextMutedBrush}"
                            Margin="16,0,0,0"/>
             </Grid>
             

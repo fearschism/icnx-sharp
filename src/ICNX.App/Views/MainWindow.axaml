@@ -3,6 +3,7 @@
         xmlns:vm="using:ICNX.App.ViewModels"
         xmlns:ctrl="using:ICNX.App.Views.Controls"
         xmlns:views="using:ICNX.App.Views"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
@@ -11,16 +12,16 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="ICNX - Cross-Platform Download Manager"
         MinWidth="900" MinHeight="650"
-        Background="{StaticResource BackgroundGradientBrush}">
+        Background="{DynamicResource BackgroundGradientBrush}">
 
     <!-- Main Grid with Sidebar and Content -->
     <Grid ColumnDefinitions="60,*">
         
         <!-- Sidebar -->
         <Border Grid.Column="0" 
-                Background="{StaticResource HeaderGlassBrush}" 
+                Background="{DynamicResource HeaderGlassBrush}" 
                 BorderThickness="0,0,1,0"
-                BorderBrush="{StaticResource BorderDefaultBrush}">
+                BorderBrush="{DynamicResource BorderDefaultBrush}">
             <StackPanel Spacing="8" Margin="0,16">
                 
                 <!-- Download Icon -->
@@ -33,10 +34,10 @@
                         Click="OnSidebarButtonClick"
                         Tag="0"
                         ToolTip.Tip="Quick Download">
-                    <TextBlock Text="⬇" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                    <materialIcons:MaterialIcon Kind="Download" Width="30" Height="30" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     <Button.Styles>
                         <Style Selector="Button:pointerover">
-                            <Setter Property="Background" Value="{StaticResource SurfaceGlassBrush}"/>
+                            <Setter Property="Background" Value="{DynamicResource SurfaceGlassBrush}"/>
                         </Style>
                         <Style Selector="Button.selected">
                             <Setter Property="Background" Value="#4D6366F1"/>
@@ -54,10 +55,10 @@
                         Click="OnSidebarButtonClick"
                         Tag="1"
                         ToolTip.Tip="Download History">
-                    <TextBlock Text="📋" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                    <materialIcons:MaterialIcon Kind="History" Width="30" Height="30" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     <Button.Styles>
                         <Style Selector="Button:pointerover">
-                            <Setter Property="Background" Value="{StaticResource SurfaceGlassBrush}"/>
+                            <Setter Property="Background" Value="{DynamicResource SurfaceGlassBrush}"/>
                         </Style>
                         <Style Selector="Button.selected">
                             <Setter Property="Background" Value="#4D6366F1"/>
@@ -75,10 +76,10 @@
                         Click="OnSidebarButtonClick"
                         Tag="2"
                         ToolTip.Tip="Settings">
-                    <TextBlock Text="⚙" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                    <materialIcons:MaterialIcon Kind="Cog" Width="30" Height="30" Foreground="{DynamicResource TextSecondaryBrush}"/>
                     <Button.Styles>
                         <Style Selector="Button:pointerover">
-                            <Setter Property="Background" Value="{StaticResource SurfaceGlassBrush}"/>
+                            <Setter Property="Background" Value="{DynamicResource SurfaceGlassBrush}"/>
                         </Style>
                         <Style Selector="Button.selected">
                             <Setter Property="Background" Value="#4D6366F1"/>
@@ -110,6 +111,44 @@
                                        Foreground="#E0FFFFFF" 
                                        TextWrapping="Wrap" 
                                        LineHeight="24"/>
+                            
+                            <!-- Download Directory Display -->
+                            <Border Background="#40FFFFFF" 
+                                    CornerRadius="8" 
+                                    Padding="16,12" 
+                                    Margin="0,16,0,0">
+                                <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                        <materialIcons:MaterialIcon Kind="Folder" 
+                                                                     Foreground="#80FFFFFF" 
+                                                                     Width="16" 
+                                                                     Height="16"/>
+                                        <TextBlock Text="Download Directory:" 
+                                                   FontSize="14" 
+                                                   Foreground="#80FFFFFF" 
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    
+                                    <TextBlock Grid.Column="1" 
+                                               Text="{Binding SettingsViewModel.DownloadDirectory}" 
+                                               FontSize="14" 
+                                               Foreground="White" 
+                                               VerticalAlignment="Center" 
+                                               Margin="12,0,12,0" 
+                                               TextTrimming="CharacterEllipsis"/>
+                                    
+                                    <Button Grid.Column="2" 
+                                            Content="Change in Settings" 
+                                            Command="{Binding NavigateToDirectorySettingsCommand}"
+                                            Background="#4000A2E8" 
+                                            BorderBrush="#6000A2E8" 
+                                            Foreground="#00A2E8" 
+                                            CornerRadius="6" 
+                                            Padding="12,6" 
+                                            FontSize="12" 
+                                            FontWeight="Medium"/>
+                                </Grid>
+                            </Border>
                             
                             <Grid ColumnDefinitions="*,Auto" Margin="0,16,0,0">
                                 <TextBox Grid.Column="0" 
@@ -169,8 +208,8 @@
                     </ItemsControl>
                     
                     <!-- Empty State -->
-                    <Border Background="{StaticResource SurfaceGlassBrush}" 
-                            BorderBrush="{StaticResource BorderDefaultBrush}"
+                    <Border Background="{DynamicResource SurfaceGlassBrush}" 
+                            BorderBrush="{DynamicResource BorderDefaultBrush}"
                             CornerRadius="12"
                             Padding="20"
                             IsVisible="{Binding !DownloadSessions.Count}">
@@ -182,12 +221,12 @@
                             <TextBlock Text="No Active Downloads" 
                                        FontSize="18"
                                        FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"
                                        HorizontalAlignment="Center" 
                                        Opacity="0.7"/>
                             <TextBlock Text="Start a download using the form above" 
                                        FontSize="14"
-                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
                                        HorizontalAlignment="Center" 
                                        Opacity="0.5"/>
                         </StackPanel>
@@ -200,18 +239,18 @@
                 <StackPanel Spacing="24" MaxWidth="800">
                     
                     <!-- History Header -->
-                    <Border Background="{StaticResource SurfaceGlassBrush}" 
-                            BorderBrush="{StaticResource BorderDefaultBrush}"
+                    <Border Background="{DynamicResource SurfaceGlassBrush}" 
+                            BorderBrush="{DynamicResource BorderDefaultBrush}"
                             CornerRadius="12"
                             Padding="20">
                         <StackPanel>
                             <TextBlock Text="Download History" 
                                        FontSize="18"
                                        FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
                             <TextBlock Text="View and manage your completed downloads" 
                                        FontSize="14"
-                                       Foreground="{StaticResource TextSecondaryBrush}" 
+                                       Foreground="{DynamicResource TextSecondaryBrush}" 
                                        Opacity="0.7"/>
                         </StackPanel>
                     </Border>

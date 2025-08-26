@@ -314,6 +314,16 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
+    private void NavigateToDirectorySettings()
+    {
+        // Switch to Settings tab
+        SelectedTabIndex = 2;
+
+        // Ensure General settings section is selected
+        SettingsViewModel.SelectedSettingsIndex = 0;
+    }
+
     public void Dispose()
     {
         _sessionRefreshTimer?.Stop();

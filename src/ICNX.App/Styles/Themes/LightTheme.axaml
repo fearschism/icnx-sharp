@@ -1,0 +1,85 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Light Theme Colors -->
+    
+    <!-- Background Colors -->
+    <Color x:Key="BackgroundPrimary">#FFFFFFFF</Color>
+    <Color x:Key="BackgroundSecondary">#FFF8FAFC</Color>
+    <Color x:Key="BackgroundTertiary">#FFF1F5F9</Color>
+    
+    <!-- Surface Colors -->
+    <Color x:Key="SurfaceBase">#FFFFFFFF</Color>
+    <Color x:Key="SurfaceElevated">#FFFFFFFF</Color>
+    <Color x:Key="SurfaceGlass">#F0FFFFFF</Color>
+    <Color x:Key="SurfaceCard">#FFFFFFFF</Color>
+    
+    <!-- Text Colors -->
+    <Color x:Key="TextPrimary">#FF0F172A</Color>
+    <Color x:Key="TextSecondary">#FF334155</Color>
+    <Color x:Key="TextMuted">#FF64748B</Color>
+    <Color x:Key="TextDisabled">#FF94A3B8</Color>
+    
+    <!-- Border Colors -->
+    <Color x:Key="BorderDefault">#FFE2E8F0</Color>
+    <Color x:Key="BorderElevated">#FFCBD5E1</Color>
+    <Color x:Key="BorderFocus">#FF3B82F6</Color>
+    
+    <!-- Semantic Colors -->
+    <Color x:Key="Success">#FF16A34A</Color>
+    <Color x:Key="Warning">#FFCA8A04</Color>
+    <Color x:Key="Error">#FFDC2626</Color>
+    <Color x:Key="Info">#FF0284C7</Color>
+    
+    <!-- Shadow Colors -->
+    <Color x:Key="ShadowLight">#10000000</Color>
+    <Color x:Key="ShadowMedium">#20000000</Color>
+    <Color x:Key="ShadowDark">#30000000</Color>
+    
+    <!-- Hover and Interactive States -->
+    <Color x:Key="HoverOverlay">#10000000</Color>
+    <Color x:Key="PressedOverlay">#20000000</Color>
+    <Color x:Key="SelectedOverlay">#20000000</Color>
+    
+    <!-- Progress Colors -->
+    <Color x:Key="ProgressBackground">#FFE2E8F0</Color>
+    <Color x:Key="ProgressFillStart">#FF3B82F6</Color>
+    <Color x:Key="ProgressFillEnd">#FF6366F1</Color>
+    
+    <!-- Solid Brushes -->
+    <SolidColorBrush x:Key="BackgroundPrimaryBrush" Color="{StaticResource BackgroundPrimary}"/>
+    <SolidColorBrush x:Key="BackgroundSecondaryBrush" Color="{StaticResource BackgroundSecondary}"/>
+    <SolidColorBrush x:Key="BackgroundTertiaryBrush" Color="{StaticResource BackgroundTertiary}"/>
+    
+    <SolidColorBrush x:Key="SurfaceBaseBrush" Color="{StaticResource SurfaceBase}"/>
+    <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="{StaticResource SurfaceElevated}"/>
+    <SolidColorBrush x:Key="SurfaceGlassBrush" Color="{StaticResource SurfaceGlass}"/>
+    <SolidColorBrush x:Key="SurfaceCardBrush" Color="{StaticResource SurfaceCard}"/>
+    
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMuted}"/>
+    <SolidColorBrush x:Key="TextDisabledBrush" Color="{StaticResource TextDisabled}"/>
+    
+    <SolidColorBrush x:Key="BorderDefaultBrush" Color="{StaticResource BorderDefault}"/>
+    <SolidColorBrush x:Key="BorderElevatedBrush" Color="{StaticResource BorderElevated}"/>
+    <SolidColorBrush x:Key="BorderFocusBrush" Color="{StaticResource BorderFocus}"/>
+    
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource Success}"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource Warning}"/>
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource Error}"/>
+    <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource Info}"/>
+    
+    <!-- Gradient Brushes -->
+    <LinearGradientBrush x:Key="BackgroundGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="{StaticResource BackgroundPrimary}" Offset="0"/>
+        <GradientStop Color="{StaticResource BackgroundSecondary}" Offset="0.5"/>
+        <GradientStop Color="{StaticResource BackgroundTertiary}" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="ProgressGradientBrush" StartPoint="0%,0%" EndPoint="100%,0%">
+        <GradientStop Color="{StaticResource ProgressFillStart}" Offset="0"/>
+        <GradientStop Color="{StaticResource ProgressFillEnd}" Offset="1"/>
+    </LinearGradientBrush>
+
+</ResourceDictionary>

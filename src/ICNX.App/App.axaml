@@ -1,11 +1,18 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:conv="using:ICNX.App.Converters"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="ICNX.App.App"
              Name="ICNX"
              RequestedThemeVariant="Dark">
 
+  <Application.Styles>
+    <FluentTheme />
+    <materialIcons:MaterialIconStyles />
+  </Application.Styles>
+
   <Application.Resources>
+    
     <!-- Value Converters -->
     <conv:StatusToBrushConverter x:Key="StatusToBrushConverter"/>
     <conv:ProgressToWidthConverter x:Key="ProgressToWidthConverter"/>
@@ -15,11 +22,14 @@
     <conv:StatusToActiveConverter x:Key="StatusToActiveConverter"/>
     <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     
-    <!-- Essential Colors -->
+    <!-- Essential Colors - These will be updated by ThemeService -->
     <Color x:Key="BackgroundPrimary">#FF1A1A2E</Color>
     <Color x:Key="BackgroundSecondary">#FF16213E</Color>
+    <Color x:Key="BackgroundTertiary">#FF0F1419</Color>
     <Color x:Key="SurfaceBase">#FF2A2D3A</Color>
     <Color x:Key="SurfaceElevated">#FF3A3D4A</Color>
+    <Color x:Key="SurfaceGlass">#4D2A2D3A</Color>
+    <Color x:Key="SurfaceCard">#8A2A2D3A</Color>
     <Color x:Key="AccentPrimary">#FF3B82F6</Color>
     <Color x:Key="GradientStart">#FF6366F1</Color>
     <Color x:Key="GradientMiddle">#FF8B5CF6</Color>
@@ -27,28 +37,35 @@
     <Color x:Key="TextPrimary">#FFF1F5F9</Color>
     <Color x:Key="TextSecondary">#FFCBD5E1</Color>
     <Color x:Key="TextMuted">#FF94A3B8</Color>
+    <Color x:Key="TextDisabled">#FF64748B</Color>
     <Color x:Key="BorderDefault">#FF243041</Color>
     <Color x:Key="BorderElevated">#FF374151</Color>
     <Color x:Key="BorderFocus">#FF3B82F6</Color>
+    <Color x:Key="HoverOverlay">#20FFFFFF</Color>
+    <Color x:Key="PressedOverlay">#30FFFFFF</Color>
+    <Color x:Key="SelectedOverlay">#40FFFFFF</Color>
     
-    <!-- Essential Brushes -->
-    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
-    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
-    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMuted}"/>
-    <SolidColorBrush x:Key="SurfaceBaseBrush" Color="{StaticResource SurfaceBase}"/>
-    <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="{StaticResource SurfaceElevated}"/>
-    <SolidColorBrush x:Key="SurfaceGlassBrush" Color="#4D2A2D3A"/>
-    <SolidColorBrush x:Key="BorderDefaultBrush" Color="{StaticResource BorderDefault}"/>
-    <SolidColorBrush x:Key="BorderElevatedBrush" Color="{StaticResource BorderElevated}"/>
-    <SolidColorBrush x:Key="BorderFocusBrush" Color="{StaticResource BorderFocus}"/>
-    <SolidColorBrush x:Key="AccentPrimaryBrush" Color="{StaticResource AccentPrimary}"/>
-    <SolidColorBrush x:Key="HoverOverlayBrush" Color="#20FFFFFF"/>
-    <SolidColorBrush x:Key="SelectedOverlayBrush" Color="#40FFFFFF"/>
+    <!-- Essential Brushes - These will be updated by ThemeService -->
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{DynamicResource TextPrimary}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{DynamicResource TextSecondary}"/>
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{DynamicResource TextMuted}"/>
+    <SolidColorBrush x:Key="TextDisabledBrush" Color="{DynamicResource TextDisabled}"/>
+    <SolidColorBrush x:Key="SurfaceBaseBrush" Color="{DynamicResource SurfaceBase}"/>
+    <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="{DynamicResource SurfaceElevated}"/>
+    <SolidColorBrush x:Key="SurfaceGlassBrush" Color="{DynamicResource SurfaceGlass}"/>
+    <SolidColorBrush x:Key="SurfaceCardBrush" Color="{DynamicResource SurfaceCard}"/>
+    <SolidColorBrush x:Key="BorderDefaultBrush" Color="{DynamicResource BorderDefault}"/>
+    <SolidColorBrush x:Key="BorderElevatedBrush" Color="{DynamicResource BorderElevated}"/>
+    <SolidColorBrush x:Key="BorderFocusBrush" Color="{DynamicResource BorderFocus}"/>
+    <SolidColorBrush x:Key="AccentPrimaryBrush" Color="{DynamicResource AccentPrimary}"/>
+    <SolidColorBrush x:Key="HoverOverlayBrush" Color="{DynamicResource HoverOverlay}"/>
+    <SolidColorBrush x:Key="PressedOverlayBrush" Color="{DynamicResource PressedOverlay}"/>
+    <SolidColorBrush x:Key="SelectedOverlayBrush" Color="{DynamicResource SelectedOverlay}"/>
     
-    <!-- Gradient Brushes -->
+    <!-- Gradient Brushes - These will be updated by ThemeService -->
     <LinearGradientBrush x:Key="BackgroundGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
-      <GradientStop Color="{StaticResource BackgroundPrimary}" Offset="0"/>
-      <GradientStop Color="{StaticResource BackgroundSecondary}" Offset="1"/>
+      <GradientStop Color="{DynamicResource BackgroundPrimary}" Offset="0"/>
+      <GradientStop Color="{DynamicResource BackgroundSecondary}" Offset="1"/>
     </LinearGradientBrush>
     
     <LinearGradientBrush x:Key="HeaderGlassBrush" StartPoint="0%,0%" EndPoint="0%,100%">
@@ -57,7 +74,7 @@
     </LinearGradientBrush>
     
     <LinearGradientBrush x:Key="ProgressGradientBrush" StartPoint="0%,0%" EndPoint="100%,0%">
-      <GradientStop Color="{StaticResource AccentPrimary}" Offset="0"/>
+      <GradientStop Color="{DynamicResource AccentPrimary}" Offset="0"/>
       <GradientStop Color="#FF2563EB" Offset="1"/>
     </LinearGradientBrush>
   </Application.Resources>
@@ -71,21 +88,21 @@
     
     <!-- Application-wide base styles -->
     <Style Selector="Window">
-      <Setter Property="Background" Value="{StaticResource BackgroundGradientBrush}"/>
-      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource BackgroundGradientBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
       <Setter Property="FontFamily" Value="Segoe UI,Helvetica Neue,Arial,sans-serif"/>
     </Style>
     
     <Style Selector="UserControl">
       <Setter Property="Background" Value="Transparent"/>
-      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
     </Style>
 
     <!-- Override default button styles -->
     <Style Selector="Button">
-      <Setter Property="Background" Value="{StaticResource SurfaceGlassBrush}"/>
-      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-      <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource SurfaceGlassBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderDefaultBrush}"/>
       <Setter Property="BorderThickness" Value="1"/>
       <Setter Property="CornerRadius" Value="6"/>
       <Setter Property="Padding" Value="12,8"/>
@@ -93,32 +110,66 @@
     </Style>
 
     <Style Selector="Button:pointerover">
-      <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
-      <Setter Property="BorderBrush" Value="{StaticResource BorderElevatedBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderElevatedBrush}"/>
     </Style>
 
     <Style Selector="Button:pressed">
-      <Setter Property="Background" Value="{StaticResource SurfaceBaseBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}"/>
     </Style>
 
     <!-- TextBox overrides -->
     <Style Selector="TextBox">
-      <Setter Property="Background" Value="{StaticResource SurfaceGlassBrush}"/>
-      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-      <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource SurfaceGlassBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderDefaultBrush}"/>
       <Setter Property="BorderThickness" Value="1"/>
       <Setter Property="CornerRadius" Value="6"/>
       <Setter Property="Padding" Value="10,8"/>
     </Style>
 
     <Style Selector="TextBox:focus">
-      <Setter Property="BorderBrush" Value="{StaticResource BorderFocusBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderFocusBrush}"/>
+    </Style>
+
+    <!-- ComboBox overrides -->
+    <Style Selector="ComboBox">
+      <Setter Property="Background" Value="{DynamicResource SurfaceGlassBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderDefaultBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="Padding" Value="10,8"/>
+    </Style>
+
+    <Style Selector="ComboBox:focus">
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderFocusBrush}"/>
+    </Style>
+
+    <Style Selector="ComboBox:pointerover">
+      <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderElevatedBrush}"/>
+    </Style>
+
+    <Style Selector="ComboBoxItem">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+      <Setter Property="Padding" Value="10,8"/>
+    </Style>
+
+    <Style Selector="ComboBoxItem:selected">
+      <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}"/>
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <Style Selector="ComboBoxItem:pointerover">
+      <Setter Property="Background" Value="{DynamicResource HoverOverlayBrush}"/>
     </Style>
 
     <!-- ProgressBar overrides -->
     <Style Selector="ProgressBar">
-      <Setter Property="Background" Value="{StaticResource SurfaceBaseBrush}"/>
-      <Setter Property="Foreground" Value="{StaticResource ProgressGradientBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource ProgressGradientBrush}"/>
       <Setter Property="BorderThickness" Value="0"/>
       <Setter Property="CornerRadius" Value="4"/>
       <Setter Property="Height" Value="6"/>
@@ -132,7 +183,7 @@
 
     <Style Selector="TabItem">
       <Setter Property="Background" Value="Transparent"/>
-      <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
       <Setter Property="BorderThickness" Value="0,0,0,2"/>
       <Setter Property="BorderBrush" Value="Transparent"/>
       <Setter Property="Padding" Value="16,12"/>
@@ -140,12 +191,12 @@
     </Style>
 
     <Style Selector="TabItem:selected">
-      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-      <Setter Property="BorderBrush" Value="{StaticResource AccentPrimaryBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}"/>
     </Style>
 
     <Style Selector="TabItem:pointerover">
-      <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
     </Style>
 
     <!-- ListBox overrides -->
@@ -162,11 +213,11 @@
     </Style>
 
     <Style Selector="ListBoxItem:selected">
-      <Setter Property="Background" Value="{StaticResource SelectedOverlayBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource SelectedOverlayBrush}"/>
     </Style>
 
     <Style Selector="ListBoxItem:pointerover">
-      <Setter Property="Background" Value="{StaticResource HoverOverlayBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource HoverOverlayBrush}"/>
     </Style>
 
     <!-- ScrollViewer overrides -->
@@ -179,12 +230,12 @@
     </Style>
 
     <Style Selector="ScrollBar:horizontal Thumb">
-      <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}"/>
       <Setter Property="CornerRadius" Value="4"/>
     </Style>
 
     <Style Selector="ScrollBar:vertical Thumb">
-      <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}"/>
       <Setter Property="CornerRadius" Value="4"/>
     </Style>
 

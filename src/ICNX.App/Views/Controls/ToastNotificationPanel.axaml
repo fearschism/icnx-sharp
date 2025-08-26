@@ -10,8 +10,8 @@
                   Margin="24">
         <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="services:ToastNotification">
-                <Border Background="{StaticResource SurfaceCardBrush}"
-                        BorderBrush="{StaticResource BorderDefaultBrush}"
+                <Border Background="{DynamicResource SurfaceCardBrush}"
+                        BorderBrush="{DynamicResource BorderDefaultBrush}"
                         BorderThickness="1"
                         CornerRadius="8"
                         Padding="16"
@@ -44,10 +44,10 @@
                             <TextBlock Text="{Binding Title}"
                                        FontWeight="SemiBold"
                                        FontSize="14"
-                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
                             <TextBlock Text="{Binding Message}"
                                        FontSize="12"
-                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
                                        TextWrapping="Wrap"/>
                         </StackPanel>
                         
@@ -62,11 +62,11 @@
                                 CommandParameter="{Binding}">
                             <TextBlock Text="✕" 
                                        FontSize="10" 
-                                       Foreground="{StaticResource TextMutedBrush}"
+                                       Foreground="{DynamicResource TextMutedBrush}"
                                        HorizontalAlignment="Center"/>
                             <Button.Styles>
                                 <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+                                    <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}"/>
                                 </Style>
                             </Button.Styles>
                         </Button>

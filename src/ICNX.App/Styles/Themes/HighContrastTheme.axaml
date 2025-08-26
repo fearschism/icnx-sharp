@@ -1,0 +1,77 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- High Contrast Theme Colors -->
+    
+    <!-- Background Colors -->
+    <Color x:Key="BackgroundPrimary">#FF000000</Color>
+    <Color x:Key="BackgroundSecondary">#FF1C1C1C</Color>
+    <Color x:Key="BackgroundTertiary">#FF2D2D30</Color>
+    
+    <!-- Surface Colors -->
+    <Color x:Key="SurfaceBase">#FF000000</Color>
+    <Color x:Key="SurfaceElevated">#FF1C1C1C</Color>
+    <Color x:Key="SurfaceGlass">#FF000000</Color>
+    <Color x:Key="SurfaceCard">#FF1C1C1C</Color>
+    
+    <!-- Text Colors - High contrast for accessibility -->
+    <Color x:Key="TextPrimary">#FFFFFFFF</Color>
+    <Color x:Key="TextSecondary">#FFFFFFFF</Color>
+    <Color x:Key="TextMuted">#FFCCCCCC</Color>
+    <Color x:Key="TextDisabled">#FF808080</Color>
+    
+    <!-- Border Colors - Strong contrast -->
+    <Color x:Key="BorderDefault">#FFFFFFFF</Color>
+    <Color x:Key="BorderElevated">#FFFFFFFF</Color>
+    <Color x:Key="BorderFocus">#FFFFFF00</Color>
+    
+    <!-- Semantic Colors - High contrast accessible colors -->
+    <Color x:Key="Success">#FF00FF00</Color>
+    <Color x:Key="Warning">#FFFFFF00</Color>
+    <Color x:Key="Error">#FFFF0000</Color>
+    <Color x:Key="Info">#FF00FFFF</Color>
+    
+    <!-- Shadow Colors - Minimal for high contrast -->
+    <Color x:Key="ShadowLight">#00000000</Color>
+    <Color x:Key="ShadowMedium">#00000000</Color>
+    <Color x:Key="ShadowDark">#00000000</Color>
+    
+    <!-- Hover and Interactive States - Strong contrast -->
+    <Color x:Key="HoverOverlay">#40FFFFFF</Color>
+    <Color x:Key="PressedOverlay">#60FFFFFF</Color>
+    <Color x:Key="SelectedOverlay">#80FFFFFF</Color>
+    
+    <!-- Progress Colors -->
+    <Color x:Key="ProgressBackground">#FF404040</Color>
+    <Color x:Key="ProgressFillStart">#FF00FF00</Color>
+    <Color x:Key="ProgressFillEnd">#FF00FF00</Color>
+    
+    <!-- Solid Brushes -->
+    <SolidColorBrush x:Key="BackgroundPrimaryBrush" Color="{StaticResource BackgroundPrimary}"/>
+    <SolidColorBrush x:Key="BackgroundSecondaryBrush" Color="{StaticResource BackgroundSecondary}"/>
+    <SolidColorBrush x:Key="BackgroundTertiaryBrush" Color="{StaticResource BackgroundTertiary}"/>
+    
+    <SolidColorBrush x:Key="SurfaceBaseBrush" Color="{StaticResource SurfaceBase}"/>
+    <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="{StaticResource SurfaceElevated}"/>
+    <SolidColorBrush x:Key="SurfaceGlassBrush" Color="{StaticResource SurfaceGlass}"/>
+    <SolidColorBrush x:Key="SurfaceCardBrush" Color="{StaticResource SurfaceCard}"/>
+    
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMuted}"/>
+    <SolidColorBrush x:Key="TextDisabledBrush" Color="{StaticResource TextDisabled}"/>
+    
+    <SolidColorBrush x:Key="BorderDefaultBrush" Color="{StaticResource BorderDefault}"/>
+    <SolidColorBrush x:Key="BorderElevatedBrush" Color="{StaticResource BorderElevated}"/>
+    <SolidColorBrush x:Key="BorderFocusBrush" Color="{StaticResource BorderFocus}"/>
+    
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource Success}"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource Warning}"/>
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource Error}"/>
+    <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource Info}"/>
+    
+    <!-- Gradient Brushes - Disabled for high contrast -->
+    <SolidColorBrush x:Key="BackgroundGradientBrush" Color="{StaticResource BackgroundPrimary}"/>
+    <SolidColorBrush x:Key="ProgressGradientBrush" Color="{StaticResource Success}"/>
+
+</ResourceDictionary>
