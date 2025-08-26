@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -20,43 +20,43 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ToastNotificationService _toastService;
     private readonly ILogger<MainWindowViewModel> _logger;
     private readonly System.Timers.Timer _sessionRefreshTimer;
-    
+
     public SettingsViewModel SettingsViewModel { get; }
     public ToastNotificationService ToastService { get; }
-    
+
     [ObservableProperty]
     private string _greeting = "Welcome to ICNX!";
-    
+
     [ObservableProperty]
     private string _quickDownloadUrl = string.Empty;
-    
+
     [ObservableProperty]
     private string _statusMessage = "Ready";
-    
+
     [ObservableProperty]
     private bool _isDownloading = false;
-    
+
     [ObservableProperty]
     private int _selectedTabIndex = 0;
-    
+
     // Visibility properties for sidebar views
     public bool IsQuickDownloadVisible => SelectedTabIndex == 0;
     public bool IsHistoryVisible => SelectedTabIndex == 1;
     public bool IsSettingsVisible => SelectedTabIndex == 2;
-    
+
     partial void OnSelectedTabIndexChanged(int value)
     {
         OnPropertyChanged(nameof(IsQuickDownloadVisible));
         OnPropertyChanged(nameof(IsHistoryVisible));
         OnPropertyChanged(nameof(IsSettingsVisible));
     }
-    
+
     public ObservableCollection<DownloadSessionViewModel> DownloadSessions { get; } = new();
     public ObservableCollection<DownloadSessionViewModel> RecentSessions { get; } = new();
-    
+
     public MainWindowViewModel(
         IDownloadSessionService downloadService,
-        UIProgressService progressService, 
+        UIProgressService progressService,
         IEventAggregator eventAggregator,
         SettingsViewModel settingsViewModel,
         ToastNotificationService toastService,
@@ -69,42 +69,44 @@ public partial class MainWindowViewModel : ViewModelBase
         _logger = logger;
         SettingsViewModel = settingsViewModel;
         ToastService = toastService;
-        
+
         // Subscribe to progress updates
         _progressService.ProgressUpdated += OnProgressUpdate;
         _progressService.SessionProgressUpdated += OnSessionProgressUpdate;
-        
-        // Setup automatic session refresh timer (every 1 second for fast updates)
-        _sessionRefreshTimer = new System.Timers.Timer(1000);
+
+        // Setup automatic session refresh timer (every 2 seconds to reduce DB polling)
+        _sessionRefreshTimer = new System.Timers.Timer(2000);
         _sessionRefreshTimer.Elapsed += async (_, _) => await LoadRecentSessionsAsync();
         _sessionRefreshTimer.AutoReset = true;
         _sessionRefreshTimer.Start();
-            
+
         // Load recent sessions initially
         _ = LoadRecentSessionsAsync();
     }
-    
+
     [RelayCommand]
     private async Task StartQuickDownloadAsync()
     {
         if (string.IsNullOrWhiteSpace(QuickDownloadUrl))
         {
             StatusMessage = "Please enter a URL";
+            _toastService.ShowError("Invalid Input", "Please enter a URL to download");
             return;
         }
-        
+
         // Validate URL format
         if (!IsValidUrl(QuickDownloadUrl.Trim()))
         {
             StatusMessage = "Please enter a valid URL (e.g., https://example.com/file.zip)";
+            _toastService.ShowError("Invalid URL", "Please enter a valid HTTP or HTTPS URL");
             return;
         }
-        
+
         try
         {
             IsDownloading = true;
             StatusMessage = "Starting download...";
-            
+
             var downloadRequests = new[]
             {
                 new DownloadRequest
@@ -113,16 +115,17 @@ public partial class MainWindowViewModel : ViewModelBase
                     Filename = null // Auto-detect filename
                 }
             };
-            
+
             // Use default download directory for now
             var defaultDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "ICNX");
             Directory.CreateDirectory(defaultDir);
-            
+
             var sessionId = await _downloadService.StartAsync(downloadRequests, defaultDir);
-            
+
             StatusMessage = $"Download started (Session: {sessionId[..8]}...)";
             QuickDownloadUrl = string.Empty; // Clear the URL
-            
+            _toastService.ShowSuccess("Download Started", "Your download has been started successfully");
+
             // Refresh sessions
             await LoadRecentSessionsAsync();
         }
@@ -130,13 +133,14 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             _logger.LogError(ex, "Failed to start quick download");
             StatusMessage = $"Error: {ex.Message}";
+            _toastService.ShowError("Download Failed", $"Failed to start download: {ex.Message}");
         }
         finally
         {
             IsDownloading = false;
         }
     }
-    
+
     [RelayCommand]
     private async Task PauseSessionAsync(string sessionId)
     {
@@ -151,7 +155,7 @@ public partial class MainWindowViewModel : ViewModelBase
             StatusMessage = $"Error pausing session: {ex.Message}";
         }
     }
-    
+
     [RelayCommand]
     private async Task ResumeSessionAsync(string sessionId)
     {
@@ -166,7 +170,7 @@ public partial class MainWindowViewModel : ViewModelBase
             StatusMessage = $"Error resuming session: {ex.Message}";
         }
     }
-    
+
     [RelayCommand]
     private async Task CancelSessionAsync(string sessionId)
     {
@@ -181,7 +185,7 @@ public partial class MainWindowViewModel : ViewModelBase
             StatusMessage = $"Error cancelling session: {ex.Message}";
         }
     }
-    
+
     [RelayCommand]
     private async Task DeleteSessionAsync(string sessionId)
     {
@@ -189,11 +193,11 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             await _downloadService.DeleteSessionAsync(sessionId);
             StatusMessage = "Session deleted";
-            
+
             // Remove from collections
             var sessionToRemove = DownloadSessions.FirstOrDefault(s => s.SessionId == sessionId) ??
                                   RecentSessions.FirstOrDefault(s => s.SessionId == sessionId);
-            
+
             if (sessionToRemove != null)
             {
                 DownloadSessions.Remove(sessionToRemove);
@@ -206,25 +210,25 @@ public partial class MainWindowViewModel : ViewModelBase
             StatusMessage = $"Error deleting session: {ex.Message}";
         }
     }
-    
+
     private async Task LoadRecentSessionsAsync()
     {
         try
         {
             var sessions = await _downloadService.GetRecentSessionsAsync(20);
-            
+
             // Update collections
             RecentSessions.Clear();
             DownloadSessions.Clear();
-            
+
             foreach (var session in sessions.OrderByDescending(s => s.CreatedAt))
             {
                 var viewModel = new DownloadSessionViewModel(session);
-                
+
                 RecentSessions.Add(viewModel);
-                
+
                 // Add active sessions to the main collection
-                if (session.Status is DownloadStatus.Queued or DownloadStatus.Started or 
+                if (session.Status is DownloadStatus.Queued or DownloadStatus.Started or
                     DownloadStatus.Downloading or DownloadStatus.Paused)
                 {
                     DownloadSessions.Add(viewModel);
@@ -237,7 +241,7 @@ public partial class MainWindowViewModel : ViewModelBase
             StatusMessage = "Error loading sessions";
         }
     }
-    
+
     private void OnProgressUpdate(object? sender, ProgressUpdate update)
     {
         try
@@ -245,7 +249,7 @@ public partial class MainWindowViewModel : ViewModelBase
             // Find the session and update individual item progress
             var session = DownloadSessions.FirstOrDefault(s => s.SessionId == update.SessionId) ??
                          RecentSessions.FirstOrDefault(s => s.SessionId == update.SessionId);
-            
+
             if (session != null)
             {
                 // Update individual item if exists
@@ -258,7 +262,7 @@ public partial class MainWindowViewModel : ViewModelBase
             _logger.LogError(ex, "Error processing progress update");
         }
     }
-    
+
     private void OnSessionProgressUpdate(object? sender, SessionProgressSummary summary)
     {
         try
@@ -266,20 +270,20 @@ public partial class MainWindowViewModel : ViewModelBase
             // Find the session and update its overall progress
             var session = DownloadSessions.FirstOrDefault(s => s.SessionId == summary.SessionId) ??
                          RecentSessions.FirstOrDefault(s => s.SessionId == summary.SessionId);
-            
+
             if (session != null)
             {
                 var previousStatus = session.Status;
                 session.UpdateProgress(summary);
-                
+
                 // Check for session completion and show toast
                 if (previousStatus != DownloadStatus.Completed && session.Status == DownloadStatus.Completed)
                 {
-                    _toastService.ShowDownloadCompleted(session._session);
+                    _toastService.ShowDownloadCompleted(session.SessionModel);
                 }
                 else if (previousStatus != DownloadStatus.Failed && session.Status == DownloadStatus.Failed)
                 {
-                    _toastService.ShowDownloadFailed(session._session, "One or more downloads failed");
+                    _toastService.ShowDownloadFailed(session.SessionModel, "One or more downloads failed");
                 }
                 else if (previousStatus != DownloadStatus.Cancelled && session.Status == DownloadStatus.Cancelled)
                 {
@@ -292,12 +296,12 @@ public partial class MainWindowViewModel : ViewModelBase
             _logger.LogError(ex, "Error processing session progress update");
         }
     }
-    
+
     private bool IsValidUrl(string url)
     {
         if (string.IsNullOrWhiteSpace(url))
             return false;
-            
+
         try
         {
             var uri = new Uri(url);
@@ -309,7 +313,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return false;
         }
     }
-    
+
     public void Dispose()
     {
         _sessionRefreshTimer?.Stop();

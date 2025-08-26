@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using ICNX.Scripting.Interfaces;
 using ICNX.Scripting.Models;
+using Microsoft.Extensions.Logging;
 
 namespace ICNX.Scripting.Services;
 
@@ -10,6 +11,12 @@ namespace ICNX.Scripting.Services;
 public class UrlMatcher : IUrlMatcher
 {
     private readonly Dictionary<string, Regex> _compiledPatterns = new();
+    private readonly ILogger<UrlMatcher>? _logger;
+
+    public UrlMatcher(ILogger<UrlMatcher>? logger = null)
+    {
+        _logger = logger;
+    }
 
     public bool IsMatch(string url, IEnumerable<string> patterns)
     {
@@ -23,6 +30,11 @@ public class UrlMatcher : IUrlMatcher
 
             try
             {
+                // First try simple substring matching
+                if (IsSimplePatternMatch(url, pattern))
+                    return true;
+
+                // Then try as regex pattern
                 var regex = GetCompiledPattern(pattern);
                 if (regex.IsMatch(url))
                     return true;
@@ -34,8 +46,47 @@ public class UrlMatcher : IUrlMatcher
             }
             catch (ArgumentException)
             {
-                // Invalid regex pattern, skip it
-                continue;
+                // Invalid regex pattern, try simple substring match as fallback
+                if (IsSimplePatternMatch(url, pattern))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool IsSimplePatternMatch(string url, string pattern)
+    {
+        // Direct substring match
+        if (url.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        // Special handling for YouTube patterns
+        if (pattern.Contains("youtube.com", StringComparison.OrdinalIgnoreCase))
+        {
+            if (url.Contains("youtu.be", StringComparison.OrdinalIgnoreCase) ||
+                url.Contains("youtube.com", StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        // Special handling for GitHub patterns with paths
+        if (pattern.Contains("github.com/", StringComparison.OrdinalIgnoreCase))
+        {
+            var parts = pattern.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 2 && parts[0].Contains("github.com", StringComparison.OrdinalIgnoreCase))
+            {
+                // Check if URL contains github.com and the specified path
+                if (url.Contains("github.com", StringComparison.OrdinalIgnoreCase))
+                {
+                    for (int i = 1; i < parts.Length; i++)
+                    {
+                        if (url.Contains($"/{parts[i]}/", StringComparison.OrdinalIgnoreCase) ||
+                            url.Contains($"/{parts[i]}", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return true;
+                        }
+                    }
+                }
             }
         }
 
@@ -69,8 +120,8 @@ public class UrlMatcher : IUrlMatcher
         if (_compiledPatterns.TryGetValue(pattern, out var cached))
             return cached;
 
-        var regex = new Regex(pattern, 
-            RegexOptions.Compiled | RegexOptions.IgnoreCase, 
+        var regex = new Regex(pattern,
+            RegexOptions.Compiled | RegexOptions.IgnoreCase,
             TimeSpan.FromSeconds(1));
 
         _compiledPatterns[pattern] = regex;
@@ -87,7 +138,7 @@ public class UrlMatcher : IUrlMatcher
             {
                 var regex = GetCompiledPattern(pattern);
                 var match = regex.Match(url);
-                
+
                 if (match.Success)
                 {
                     // More specific patterns have longer matches

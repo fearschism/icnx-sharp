@@ -13,20 +13,69 @@ namespace ICNX.Core.Services;
 public class ProgressTracker : IProgressTracker, IDisposable
 {
     private readonly ILogger<ProgressTracker> _logger;
+    private readonly IEventAggregator _eventAggregator;
     private readonly Subject<ProgressUpdate> _progressSubject = new();
     private readonly ConcurrentDictionary<string, ProgressUpdate> _currentProgress = new();
     private readonly Timer _batchTimer;
     private readonly ConcurrentQueue<ProgressUpdate> _pendingUpdates = new();
     private readonly SemaphoreSlim _batchLock = new(1, 1);
-    
+
     private bool _disposed = false;
 
     public ProgressTracker(ILogger<ProgressTracker> logger)
     {
         _logger = logger;
-        
+
         // Batch progress updates every 250ms to avoid overwhelming subscribers
         _batchTimer = new Timer(FlushPendingUpdates, null, TimeSpan.FromMilliseconds(250), TimeSpan.FromMilliseconds(250));
+    }
+
+    // New constructor used by tests which expect an event aggregator dependency
+    public ProgressTracker(IEventAggregator eventAggregator, ILogger<ProgressTracker> logger)
+        : this(logger)
+    {
+        _eventAggregator = eventAggregator;
+    }
+
+    /// <summary>
+    /// Async-friendly report method expected by tests. Validates input, enriches the update, and publishes via event aggregator.
+    /// </summary>
+    public async Task ReportProgressAsync(ProgressUpdate? update)
+    {
+        if (update == null) throw new ArgumentNullException(nameof(update));
+        if (string.IsNullOrWhiteSpace(update.SessionId)) throw new ArgumentException("SessionId is required", nameof(update.SessionId));
+        if (string.IsNullOrWhiteSpace(update.ItemId)) throw new ArgumentException("ItemId is required", nameof(update.ItemId));
+
+        // Set timestamp/updatedat
+        update.UpdatedAt = DateTime.UtcNow;
+
+        // Compute estimated time remaining if possible
+        if (update.SpeedBytesPerSec.HasValue && update.SpeedBytesPerSec.Value > 0 && update.TotalBytes.HasValue)
+        {
+            var remaining = Math.Max(0, (double)(update.TotalBytes.Value - update.DownloadedBytes));
+            update.EstimatedTimeRemaining = TimeSpan.FromSeconds(remaining / update.SpeedBytesPerSec.Value);
+        }
+        else
+        {
+            update.EstimatedTimeRemaining = null;
+        }
+
+        try
+        {
+            // Update internal structures synchronously for later batched consumers
+            ReportProgress(update);
+
+            // Publish via event aggregator if available
+            if (_eventAggregator != null)
+            {
+                await _eventAggregator.PublishAsync(update);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to report progress asynchronously");
+            throw;
+        }
     }
 
     public void ReportProgress(ProgressUpdate update)
@@ -36,13 +85,13 @@ public class ProgressTracker : IProgressTracker, IDisposable
         try
         {
             var key = $"{update.SessionId}_{update.ItemId}";
-            
+
             // Store current progress for lookup
             _currentProgress.AddOrUpdate(key, update, (_, _) => update);
-            
+
             // Queue for batched processing
             _pendingUpdates.Enqueue(update);
-            
+
             // Immediate processing for critical updates (completed, failed, cancelled)
             if (IsCriticalUpdate(update.Status))
             {
@@ -51,7 +100,7 @@ public class ProgressTracker : IProgressTracker, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to report progress for {SessionId}_{ItemId}", 
+            _logger.LogError(ex, "Failed to report progress for {SessionId}_{ItemId}",
                 update.SessionId, update.ItemId);
         }
     }
@@ -80,7 +129,7 @@ public class ProgressTracker : IProgressTracker, IDisposable
         try
         {
             var keysToRemove = new List<string>();
-            
+
             foreach (var kvp in _currentProgress)
             {
                 if (IsCompletedStatus(kvp.Value.Status))
@@ -100,7 +149,7 @@ public class ProgressTracker : IProgressTracker, IDisposable
         {
             _logger.LogError(ex, "Failed to clear completed progress");
         }
-        
+
         await Task.CompletedTask;
     }
 
@@ -138,7 +187,7 @@ public class ProgressTracker : IProgressTracker, IDisposable
 
         var totalBytes = sessionUpdates.Sum(u => u.TotalBytes ?? 0);
         var downloadedBytes = sessionUpdates.Sum(u => u.DownloadedBytes);
-        
+
         var speedUpdates = sessionUpdates.Where(u => u.SpeedBytesPerSec.HasValue).ToList();
         var averageSpeed = speedUpdates.Any() ? speedUpdates.Average(u => u.SpeedBytesPerSec!.Value) : 0;
 
@@ -166,7 +215,7 @@ public class ProgressTracker : IProgressTracker, IDisposable
         try
         {
             var updates = new List<ProgressUpdate>();
-            
+
             // Dequeue up to 100 updates at a time
             while (_pendingUpdates.TryDequeue(out var update) && updates.Count < 100)
             {
@@ -225,7 +274,7 @@ public class ProgressTracker : IProgressTracker, IDisposable
         _batchLock?.Dispose();
         _progressSubject?.OnCompleted();
         _progressSubject?.Dispose();
-        
+
         GC.SuppressFinalize(this);
     }
 }

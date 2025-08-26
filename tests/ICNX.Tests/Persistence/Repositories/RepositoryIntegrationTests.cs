@@ -10,6 +10,7 @@ namespace ICNX.Tests.Persistence.Repositories;
 public class RepositoryIntegrationTests : IDisposable
 {
     private readonly string _connectionString;
+    private readonly string _tempDbPath;
     private readonly SqliteConnection _connection;
     private readonly DownloadSessionRepository _sessionRepository;
     private readonly DownloadItemRepository _itemRepository;
@@ -17,23 +18,26 @@ public class RepositoryIntegrationTests : IDisposable
 
     public RepositoryIntegrationTests()
     {
-        // Use in-memory SQLite database for testing
-        _connectionString = "Data Source=:memory:";
+        // Use temporary file-based SQLite database for testing
+        var tempPath = Path.GetTempFileName();
+        File.Delete(tempPath); // Delete the file but keep the unique name
+        _tempDbPath = Path.ChangeExtension(tempPath, ".db");
+        _connectionString = $"Data Source={_tempDbPath}";
         _connection = new SqliteConnection(_connectionString);
         _connection.Open();
-        
+
         // Initialize repositories
         var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-        
-        _sessionRepository = new DownloadSessionRepository(_connectionString, 
+
+        _sessionRepository = new DownloadSessionRepository(_connectionString,
             loggerFactory.CreateLogger<DownloadSessionRepository>());
-        _itemRepository = new DownloadItemRepository(_connectionString, 
+        _itemRepository = new DownloadItemRepository(_connectionString,
             loggerFactory.CreateLogger<DownloadItemRepository>());
-        _settingsRepository = new SettingsRepository(_connectionString, 
+        _settingsRepository = new SettingsRepository(_connectionString,
             loggerFactory.CreateLogger<SettingsRepository>());
-        
+
         // Run migrations
-        var migrationRunner = new MigrationRunner(_connectionString, 
+        var migrationRunner = new MigrationRunner(_connectionString,
             loggerFactory.CreateLogger<MigrationRunner>());
         migrationRunner.RunMigrationsAsync().GetAwaiter().GetResult();
     }
@@ -86,8 +90,18 @@ public class RepositoryIntegrationTests : IDisposable
     [Fact]
     public async Task DownloadItemRepository_ShouldCrudOperations_Successfully()
     {
-        // Arrange
+        // Arrange - First create a session for the foreign key constraint
         var sessionId = Guid.NewGuid().ToString();
+        var session = new DownloadSession
+        {
+            Id = sessionId,
+            Title = "Test Session for Item CRUD",
+            Status = DownloadStatus.Queued,
+            TotalCount = 1,
+            CreatedAt = DateTime.UtcNow
+        };
+        await _sessionRepository.AddAsync(session);
+
         var item = new DownloadItem
         {
             Id = Guid.NewGuid().ToString(),
@@ -162,19 +176,19 @@ public class RepositoryIntegrationTests : IDisposable
 
         // Act - Retrieve
         var retrievedSettings = await _settingsRepository.GetSettingsAsync();
-        
+
         // Assert
         retrievedSettings.Should().NotBeNull();
         retrievedSettings!.DefaultDownloadDir.Should().Be(settings.DefaultDownloadDir);
         retrievedSettings.Concurrency.Should().Be(settings.Concurrency);
         retrievedSettings.AutoResumeOnLaunch.Should().Be(settings.AutoResumeOnLaunch);
         retrievedSettings.SpeedLimitBytesPerSec.Should().Be(settings.SpeedLimitBytesPerSec);
-        
+
         // Verify nested objects
         retrievedSettings.RetryPolicy.Should().NotBeNull();
         retrievedSettings.RetryPolicy.MaxAttempts.Should().Be(settings.RetryPolicy.MaxAttempts);
         retrievedSettings.RetryPolicy.BaseDelayMs.Should().Be(settings.RetryPolicy.BaseDelayMs);
-        
+
         retrievedSettings.Appearance.Should().NotBeNull();
         retrievedSettings.Appearance.Theme.Should().Be(settings.Appearance.Theme);
         retrievedSettings.Appearance.AccentColor.Should().Be(settings.Appearance.AccentColor);
@@ -212,7 +226,7 @@ public class RepositoryIntegrationTests : IDisposable
         {
             var sessionId = Guid.NewGuid().ToString();
             sessionIds.Add(sessionId);
-            
+
             var session = new DownloadSession
             {
                 Id = sessionId,
@@ -230,7 +244,7 @@ public class RepositoryIntegrationTests : IDisposable
         // Assert
         var allSessions = await _sessionRepository.GetAllAsync();
         allSessions.Should().HaveCount(10);
-        
+
         foreach (var sessionId in sessionIds)
         {
             var session = await _sessionRepository.GetByIdAsync(sessionId);
@@ -241,15 +255,34 @@ public class RepositoryIntegrationTests : IDisposable
     [Fact]
     public async Task DownloadItemRepository_ShouldFilterBySession()
     {
-        // Arrange
+        // Arrange - First create sessions for the foreign key constraints
         var session1Id = Guid.NewGuid().ToString();
         var session2Id = Guid.NewGuid().ToString();
 
+        var session1 = new DownloadSession
+        {
+            Id = session1Id,
+            Title = "Test Session 1",
+            Status = DownloadStatus.Queued,
+            TotalCount = 2,
+            CreatedAt = DateTime.UtcNow
+        };
+        var session2 = new DownloadSession
+        {
+            Id = session2Id,
+            Title = "Test Session 2",
+            Status = DownloadStatus.Queued,
+            TotalCount = 1,
+            CreatedAt = DateTime.UtcNow
+        };
+        await _sessionRepository.AddAsync(session1);
+        await _sessionRepository.AddAsync(session2);
+
         var items = new[]
         {
-            new DownloadItem { Id = Guid.NewGuid().ToString(), SessionId = session1Id, Filename = "file1.zip" },
-            new DownloadItem { Id = Guid.NewGuid().ToString(), SessionId = session1Id, Filename = "file2.zip" },
-            new DownloadItem { Id = Guid.NewGuid().ToString(), SessionId = session2Id, Filename = "file3.zip" }
+            new DownloadItem { Id = Guid.NewGuid().ToString(), SessionId = session1Id, Filename = "file1.zip", Url = "https://example.com/file1.zip", Status = DownloadStatus.Queued, CreatedAt = DateTime.UtcNow },
+            new DownloadItem { Id = Guid.NewGuid().ToString(), SessionId = session1Id, Filename = "file2.zip", Url = "https://example.com/file2.zip", Status = DownloadStatus.Queued, CreatedAt = DateTime.UtcNow },
+            new DownloadItem { Id = Guid.NewGuid().ToString(), SessionId = session2Id, Filename = "file3.zip", Url = "https://example.com/file3.zip", Status = DownloadStatus.Queued, CreatedAt = DateTime.UtcNow }
         };
 
         // Act
@@ -289,7 +322,7 @@ public class RepositoryIntegrationTests : IDisposable
         try
         {
             await _sessionRepository.AddAsync(session);
-            
+
             foreach (var item in items)
             {
                 await _itemRepository.AddAsync(item);
@@ -315,5 +348,18 @@ public class RepositoryIntegrationTests : IDisposable
     {
         _connection?.Close();
         _connection?.Dispose();
+
+        // Clean up temporary database file
+        if (File.Exists(_tempDbPath))
+        {
+            try
+            {
+                File.Delete(_tempDbPath);
+            }
+            catch
+            {
+                // Ignore errors during cleanup
+            }
+        }
     }
 }

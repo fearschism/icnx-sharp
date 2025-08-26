@@ -30,6 +30,12 @@ public class ContentExtractor : IContentExtractor
         _logger = logger;
     }
 
+    // Test-friendly ctor: allow constructing with a logger only (creates a default HttpClient)
+    public ContentExtractor(IScriptRepository scriptRepository, IUrlMatcher urlMatcher, IScriptEngine scriptEngine, ILogger<ContentExtractor> logger)
+        : this(scriptRepository, urlMatcher, scriptEngine, new HttpClient(), logger)
+    {
+    }
+
     public async Task<ScriptExecutionResult> ExtractLinksAsync(string url, CancellationToken cancellationToken = default)
     {
         try
@@ -49,7 +55,7 @@ public class ContentExtractor : IContentExtractor
                 var result = await ExtractLinksWithScriptAsync(url, script, cancellationToken);
                 if (result.Success && result.ExtractedLinks.Any())
                 {
-                    _logger.LogInformation("Successfully extracted {Count} links using script {ScriptName}", 
+                    _logger.LogInformation("Successfully extracted {Count} links using script {ScriptName}",
                         result.ExtractedLinks.Count, script.Name);
                     return result;
                 }
@@ -185,7 +191,7 @@ public class ContentExtractor : IContentExtractor
 
         var uri = new Uri(url);
         var path = uri.AbsolutePath.ToLowerInvariant();
-        
+
         return downloadExtensions.Any(ext => path.EndsWith(ext));
     }
 
@@ -211,13 +217,13 @@ public class ContentExtractor : IContentExtractor
         {
             // Pattern for href attributes with download extensions
             var linkPattern = @"href=[""']([^""']*\.(?:zip|rar|7z|tar|gz|exe|msi|dmg|pkg|deb|rpm|mp4|avi|mkv|mov|wmv|flv|webm|m4v|mp3|wav|flac|ogg|aac|m4a|wma|jpg|jpeg|png|gif|bmp|webp|svg|pdf|doc|docx|xls|xlsx|ppt|pptx|txt))[""']";
-            
+
             var matches = Regex.Matches(html, linkPattern, RegexOptions.IgnoreCase);
 
             foreach (Match match in matches)
             {
                 var linkUrl = match.Groups[1].Value;
-                
+
                 // Make absolute URL
                 if (!Uri.IsWellFormedUriString(linkUrl, UriKind.Absolute))
                 {

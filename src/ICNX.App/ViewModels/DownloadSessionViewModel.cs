@@ -56,6 +56,9 @@ public partial class DownloadSessionViewModel : ViewModelBase
 
     public string SessionId { get; }
 
+    // Expose the underlying model for consumers that need full access to the session data
+    public DownloadSession SessionModel => _session;
+
     public ObservableCollection<DownloadItemViewModel> Items { get; } = new();
 
     public DownloadSessionViewModel(DownloadSession session)
@@ -110,12 +113,12 @@ public partial class DownloadSessionViewModel : ViewModelBase
     {
         OverallProgress = summary.OverallProgress;
         ProgressText = $"{summary.OverallProgress:F1}%";
-        
+
         // Update counts from summary
         CompletedCount = summary.CompletedItems;
         FailedCount = summary.FailedItems;
         CancelledCount = summary.CancelledItems;
-        
+
         // Update status text with more detail
         if (summary.ActiveItems > 0)
         {

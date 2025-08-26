@@ -22,16 +22,56 @@ public class DownloadEngine : IDownloadEngine
         _logger = logger;
     }
 
-    public async Task<bool> DownloadAsync(DownloadItem item, string destinationPath, 
+    private async Task<(int chunkCount, bool supportsRanges, long? contentLength)> DetermineChunkAndRangeAsync(string url)
+    {
+        try
+        {
+            using var httpClient = new HttpClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(10);
+
+            var request = new HttpRequestMessage(HttpMethod.Head, url);
+            var response = await httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var contentLength = response.Content.Headers.ContentLength;
+                var supportsRanges = response.Headers.AcceptRanges?.Contains("bytes") == true;
+
+                var fileSizeMB = contentLength.HasValue ? contentLength.Value / (1024 * 1024) : 0;
+
+                var chunkCount = fileSizeMB switch
+                {
+                    < 10 => 1,
+                    < 100 => 4,
+                    < 500 => 6,
+                    _ => 8
+                };
+
+                return (chunkCount, supportsRanges, contentLength);
+            }
+
+            return (1, false, null);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to determine chunk/range info for {Url}, defaulting to single chunk", url);
+            return (1, false, null);
+        }
+    }
+
+    public async Task<bool> DownloadAsync(DownloadItem item, string destinationPath,
         IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         try
         {
             _logger.LogInformation("Starting download: {ItemId} -> {Url}", item.Id, item.Url);
 
-            // Create download configuration
-            var config = CreateDownloadConfiguration(item);
-            
+            // Determine optimal chunking and whether the server supports range requests.
+            var (chunkCount, supportsRanges, contentLength) = await DetermineChunkAndRangeAsync(item.Url);
+
+            // Create download configuration based on discovered characteristics
+            var config = CreateDownloadConfiguration(item, chunkCount, supportsRanges, contentLength);
+
             // Create download instance
             var download = DownloadBuilder.New()
                 .WithUrl(item.Url)
@@ -56,7 +96,7 @@ public class DownloadEngine : IDownloadEngine
 
             // Check final status
             var success = download.Status == Downloader.DownloadStatus.Completed;
-            
+
             if (success)
             {
                 _logger.LogInformation("Download completed successfully: {ItemId}", item.Id);
@@ -72,6 +112,13 @@ public class DownloadEngine : IDownloadEngine
         {
             _logger.LogInformation("Download cancelled: {ItemId}", item.Id);
             ReportProgress(item, DownloadStatus.Cancelled, item.DownloadedBytes, progress, "Download cancelled");
+            return false;
+        }
+        catch (IOException ioEx)
+        {
+            // Disk/IO related errors (disk full, permission issues, etc.)
+            _logger.LogError(ioEx, "IO error during download: {ItemId}", item.Id);
+            ReportProgress(item, DownloadStatus.Failed, item.DownloadedBytes, progress, $"IO error: {ioEx.Message}");
             return false;
         }
         catch (Exception ex)
@@ -114,7 +161,7 @@ public class DownloadEngine : IDownloadEngine
                 {
                     // Calculate optimal chunk count based on file size
                     var fileSizeMB = contentLength.Value / (1024 * 1024);
-                    
+
                     return fileSizeMB switch
                     {
                         < 10 => 1,      // Small files: single chunk
@@ -152,7 +199,7 @@ public class DownloadEngine : IDownloadEngine
                 _logger.LogError(ex, "Failed to pause download: {ItemId}", itemId);
             }
         }
-        
+
         return false;
     }
 
@@ -174,7 +221,7 @@ public class DownloadEngine : IDownloadEngine
                 _logger.LogError(ex, "Failed to resume download: {ItemId}", itemId);
             }
         }
-        
+
         return false;
     }
 
@@ -196,22 +243,22 @@ public class DownloadEngine : IDownloadEngine
                 _logger.LogError(ex, "Failed to cancel download: {ItemId}", itemId);
             }
         }
-        
+
         return false;
     }
 
-    private DownloadConfiguration CreateDownloadConfiguration(DownloadItem item)
+    private DownloadConfiguration CreateDownloadConfiguration(DownloadItem item, int chunkCount, bool enableRange, long? contentLength)
     {
         return new DownloadConfiguration
         {
             BufferBlockSize = 65536, // 64KB buffer
-            ChunkCount = 4, // Will be determined dynamically
+            ChunkCount = Math.Max(1, chunkCount),
             ParallelDownload = true,
             MaxTryAgainOnFailure = 3,
             MaximumBytesPerSecond = 0, // No limit by default
             MaximumMemoryBufferBytes = 100 * 1024 * 1024, // 100MB
             Timeout = 30000, // 30 second timeout
-            RangeDownload = false,
+            RangeDownload = enableRange,
             ClearPackageOnCompletionWithFailure = true,
             MinimumSizeOfChunking = 1024 * 1024, // 1MB minimum for chunking
             ReserveStorageSpaceBeforeStartingDownload = true,
@@ -225,7 +272,7 @@ public class DownloadEngine : IDownloadEngine
         };
     }
 
-    private static void ReportProgress(DownloadItem item, DownloadStatus status, 
+    private static void ReportProgress(DownloadItem item, DownloadStatus status,
         long downloadedBytes, IProgress<ProgressUpdate> progress, string? error = null)
     {
         var update = new ProgressUpdate
@@ -264,27 +311,27 @@ internal class ProgressHandler
     public void OnDownloadStarted(object? sender, DownloadStartedEventArgs e)
     {
         _logger.LogDebug("Download started: {ItemId}, Size: {TotalBytes}", _item.Id, e.TotalBytesToReceive);
-        
+
         // Update item with actual file size
         _item.TotalBytes = e.TotalBytesToReceive;
-        
+
         ReportProgress(Core.Models.DownloadStatus.Started, 0);
     }
 
     public void OnDownloadProgressChanged(object? sender, DownloadProgressChangedEventArgs e)
     {
         var now = DateTime.UtcNow;
-        
+
         // Throttle progress updates to avoid overwhelming the UI (max 4 updates per second)
         if ((now - _lastProgressReport).TotalMilliseconds < 250) return;
-        
-        _lastProgressReport = now;
-        
-        // Calculate speed
+
+        // Calculate speed using the time since last reported progress.
         var timeDiff = (now - _lastProgressReport).TotalSeconds;
         var bytesDiff = e.ReceivedBytesSize - _lastDownloadedBytes;
         var speed = timeDiff > 0 ? bytesDiff / timeDiff : 0;
-        
+
+        // Update last seen values after computing diffs
+        _lastProgressReport = now;
         _lastDownloadedBytes = e.ReceivedBytesSize;
 
         var update = new ProgressUpdate
@@ -295,7 +342,7 @@ internal class ProgressHandler
             DownloadedBytes = e.ReceivedBytesSize,
             TotalBytes = e.TotalBytesToReceive > 0 ? e.TotalBytesToReceive : _item.TotalBytes,
             SpeedBytesPerSec = speed,
-            EstimatedTimeRemaining = speed > 0 && e.TotalBytesToReceive > 0 
+            EstimatedTimeRemaining = speed > 0 && e.TotalBytesToReceive > 0
                 ? TimeSpan.FromSeconds((e.TotalBytesToReceive - e.ReceivedBytesSize) / speed)
                 : null,
             Timestamp = now
@@ -311,14 +358,14 @@ internal class ProgressHandler
                     DownloadStatus.Completed;
 
         var errorMessage = e.Error?.Message;
-        
+
         if (status == DownloadStatus.Completed)
         {
             _logger.LogInformation("Download completed: {ItemId}", _item.Id);
         }
         else
         {
-            _logger.LogWarning("Download finished with status {Status}: {ItemId}, Error: {Error}", 
+            _logger.LogWarning("Download finished with status {Status}: {ItemId}, Error: {Error}",
                 status, _item.Id, errorMessage);
         }
 
@@ -328,7 +375,7 @@ internal class ProgressHandler
     public void OnChunkProgressChanged(object? sender, DownloadProgressChangedEventArgs e)
     {
         // We can use chunk progress for more detailed monitoring if needed
-        _logger.LogTrace("Chunk progress: {ItemId}, Chunk: {ActiveChunks}, Progress: {Progress}%", 
+        _logger.LogTrace("Chunk progress: {ItemId}, Chunk: {ActiveChunks}, Progress: {Progress}%",
             _item.Id, e.ActiveChunks, e.ProgressPercentage);
     }
 

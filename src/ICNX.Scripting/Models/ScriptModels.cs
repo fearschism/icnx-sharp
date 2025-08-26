@@ -57,6 +57,13 @@ public class ScriptExecutionResult
 {
     public bool Success { get; set; }
     public string? ErrorMessage { get; set; }
+    // Backwards-compatible alias expected by some tests
+    // Backwards-compatible alias expected by some tests (non-nullable string for assertion helpers)
+    public string Error
+    {
+        get => ErrorMessage ?? string.Empty;
+        set => ErrorMessage = value;
+    }
     public List<ExtractedLink> ExtractedLinks { get; set; } = new();
     public Dictionary<string, object> Metadata { get; set; } = new();
     public TimeSpan ExecutionTime { get; set; }

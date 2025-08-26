@@ -40,6 +40,20 @@ public class EventAggregator : IEventAggregator, IDisposable
         }
     }
 
+    public Task PublishAsync<T>(T eventData) where T : class
+    {
+        try
+        {
+            Publish(eventData);
+            return Task.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to publish event asynchronously for {EventType}", typeof(T).Name);
+            return Task.FromException(ex);
+        }
+    }
+
     public IObservable<T> Subscribe<T>() where T : class
     {
         if (_disposed) return Observable.Empty<T>();
@@ -48,7 +62,7 @@ public class EventAggregator : IEventAggregator, IDisposable
         {
             var eventType = typeof(T);
             var subject = _subjects.GetOrAdd(eventType, _ => new Subject<object>());
-            
+
             return subject.AsObservable()
                 .OfType<T>()
                 .DistinctUntilChanged()
@@ -96,7 +110,7 @@ public class EventAggregator : IEventAggregator, IDisposable
                     _logger.LogWarning(ex, "Error disposing subject during cleanup");
                 }
             }
-            
+
             _subjects.Clear();
             _logger.LogInformation("Cleared all event subscriptions");
         }

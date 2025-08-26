@@ -8,7 +8,7 @@ namespace ICNX.Core.Models;
 public enum DownloadStatus
 {
     Queued,
-    Started, 
+    Started,
     Downloading,
     Paused,
     Resumed,
@@ -43,11 +43,14 @@ public class DownloadItem
     public string SessionId { get; set; } = string.Empty;
     public string Url { get; set; } = string.Empty;
     public string Filename { get; set; } = string.Empty;
+    // Local path where file is saved
+    public string? LocalPath { get; set; }
     public DownloadStatus Status { get; set; }
     public string? Mime { get; set; }
     public long? TotalBytes { get; set; }
     public long DownloadedBytes { get; set; }
     public string? Error { get; set; }
+    public DateTime? CreatedAt { get; set; }
     public DateTime? StartedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
     public int RetryAttempt { get; set; } = 0;
@@ -67,11 +70,19 @@ public class ProgressUpdate
     public TimeSpan? EstimatedTimeRemaining { get; set; }
     public string? Error { get; set; }
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-    
+
+    // Backward-compatible fields expected by tests
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public double ProgressPercentage => Status == DownloadStatus.Completed ? 100.0 :
+        Status == DownloadStatus.Failed || Status == DownloadStatus.Cancelled ? 0.0 :
+        TotalBytes.HasValue && TotalBytes.Value > 0
+            ? Math.Min(100.0, (double)DownloadedBytes / TotalBytes.Value * 100.0)
+            : 0.0;
+
     /// <summary>
     /// Progress percentage (0-100)
     /// </summary>
-    public double Progress => TotalBytes.HasValue && TotalBytes.Value > 0 
+    public double Progress => TotalBytes.HasValue && TotalBytes.Value > 0
         ? Math.Min(100.0, (double)DownloadedBytes / TotalBytes.Value * 100.0)
         : 0.0;
 }
@@ -102,4 +113,12 @@ public class SessionProgressSummary
     public long DownloadedBytes { get; set; }
     public double AverageSpeed { get; set; }
     public double OverallProgress { get; set; } // 0-100
+}
+
+/// <summary>
+/// Event args for settings changed events used by some tests
+/// </summary>
+public class SettingsChangedEventArgs : EventArgs
+{
+    public List<string> ChangedProperties { get; set; } = new();
 }

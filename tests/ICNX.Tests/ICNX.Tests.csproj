@@ -21,6 +21,9 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/ICNX.Core/ICNX.Core.csproj" />
+  <ProjectReference Include="../../src/ICNX.Persistence/ICNX.Persistence.csproj" />
+  <ProjectReference Include="../../src/ICNX.Download/ICNX.Download.csproj" />
+  <ProjectReference Include="../../src/ICNX.Scripting/ICNX.Scripting.csproj" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.8" />
   </ItemGroup>
 

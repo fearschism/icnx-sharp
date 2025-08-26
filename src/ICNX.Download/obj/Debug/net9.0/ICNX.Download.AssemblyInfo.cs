@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ICNX.Download")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b65a32280538c93c6938ce88074b2450dfcba180")]
 [assembly: System.Reflection.AssemblyProductAttribute("ICNX.Download")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ICNX.Download")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

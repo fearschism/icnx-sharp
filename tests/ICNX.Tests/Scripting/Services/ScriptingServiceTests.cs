@@ -4,6 +4,7 @@ using Moq;
 using ICNX.Scripting.Models;
 using ICNX.Scripting.Services;
 using ICNX.Scripting.Interfaces;
+using ICNX.Tests.Testing;
 
 namespace ICNX.Tests.Scripting.Services;
 
@@ -55,11 +56,11 @@ public class UrlMatcherTests
     {
         // Arrange
         var url = "https://github.com/user/repo/archive/main.zip";
-        var patterns = new[] 
-        { 
-            "youtube.com", 
-            "github.com/archive", 
-            "dropbox.com" 
+        var patterns = new[]
+        {
+            "youtube.com",
+            "github.com/archive",
+            "dropbox.com"
         };
 
         // Act
@@ -191,7 +192,7 @@ public class UrlMatcherTests
         {
             var act = () => _urlMatcher.IsMatch(url, patterns);
             act.Should().NotThrow(); // Should handle gracefully, not throw
-            
+
             var result = _urlMatcher.IsMatch(url, patterns);
             result.Should().BeFalse();
         }
@@ -212,7 +213,7 @@ public class ContentExtractorTests
         _mockUrlMatcher = new Mock<IUrlMatcher>();
         _mockScriptEngine = new Mock<IScriptEngine>();
         _mockLogger = new Mock<ILogger<ContentExtractor>>();
-        
+
         _contentExtractor = new ContentExtractor(
             _mockScriptRepository.Object,
             _mockUrlMatcher.Object,
@@ -225,7 +226,7 @@ public class ContentExtractorTests
     {
         // Arrange
         var url = "https://example.com/file.zip";
-        
+
         _mockScriptRepository.Setup(r => r.GetEnabledScriptsAsync())
             .ReturnsAsync(new List<Script>());
 
@@ -250,7 +251,7 @@ public class ContentExtractorTests
             Name = "GitHub Releases",
             UrlPatterns = new List<string> { "github.com/releases" }
         };
-        
+
         var scriptResult = new ScriptExecutionResult
         {
             Success = true,
@@ -286,7 +287,7 @@ public class ContentExtractorTests
             Id = "test",
             UrlPatterns = new List<string> { "example.com" }
         };
-        
+
         var failedResult = new ScriptExecutionResult
         {
             Success = false,

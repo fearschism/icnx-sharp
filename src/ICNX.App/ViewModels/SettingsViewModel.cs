@@ -76,16 +76,16 @@ public partial class SettingsViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool _isLoading = false;
-    
+
     [ObservableProperty]
     private int _selectedSettingsIndex = 0;
-    
+
     // Visibility properties for settings sections
     public bool IsGeneralVisible => SelectedSettingsIndex == 0;
     public bool IsRetryVisible => SelectedSettingsIndex == 1;
     public bool IsAppearanceVisible => SelectedSettingsIndex == 2;
     public bool IsImportExportVisible => SelectedSettingsIndex == 3;
-    
+
     partial void OnSelectedSettingsIndexChanged(int value)
     {
         OnPropertyChanged(nameof(IsGeneralVisible));
@@ -114,7 +114,7 @@ public partial class SettingsViewModel : ViewModelBase
         _logger = logger;
 
         // Subscribe to settings changes
-        _settingsService.SettingsChanged.Subscribe(settings => OnSettingsChanged(settings));
+        _settingsService.SettingsChangedObservable.Subscribe(settings => OnSettingsChanged(settings));
 
         // Track property changes for unsaved changes detection
         // PropertyChanged += OnPropertyChanged;
@@ -132,10 +132,10 @@ public partial class SettingsViewModel : ViewModelBase
             StatusMessage = "Loading settings...";
 
             var settings = await _settingsService.GetSettingsAsync();
-            
+
             // Update properties without triggering change detection
             SetPropertiesFromSettings(settings, trackChanges: false);
-            
+
             HasUnsavedChanges = false;
             StatusMessage = "Settings loaded";
         }
@@ -160,7 +160,7 @@ public partial class SettingsViewModel : ViewModelBase
 
             var settings = CreateSettingsFromProperties();
             await _settingsService.SaveSettingsAsync(settings);
-            
+
             HasUnsavedChanges = false;
             StatusMessage = "Settings saved successfully";
         }
@@ -185,7 +185,7 @@ public partial class SettingsViewModel : ViewModelBase
 
             await _settingsService.ResetToDefaultsAsync();
             await LoadSettingsAsync();
-            
+
             StatusMessage = "Settings reset to defaults";
         }
         catch (Exception ex)
@@ -207,7 +207,7 @@ public partial class SettingsViewModel : ViewModelBase
             // This would typically open a folder browser dialog
             // For now, we'll use a simple input approach
             StatusMessage = "Use file dialog to select download directory";
-            
+
             // In a real implementation, you'd use:
             // var dialog = new OpenFolderDialog();
             // var result = await dialog.ShowAsync(parentWindow);
@@ -234,10 +234,10 @@ public partial class SettingsViewModel : ViewModelBase
             // Try to create the directory and write a test file
             Directory.CreateDirectory(DownloadDirectory);
             var testFile = Path.Combine(DownloadDirectory, "icnx_test.tmp");
-            
+
             await File.WriteAllTextAsync(testFile, "test");
             File.Delete(testFile);
-            
+
             StatusMessage = "Download directory is valid and writable";
         }
         catch (Exception ex)
@@ -286,7 +286,7 @@ public partial class SettingsViewModel : ViewModelBase
     private void SetPropertiesFromSettings(Settings settings, bool trackChanges = true)
     {
         // var wasTracking = PropertyChanged != null;
-        
+
         // if (!trackChanges && wasTracking)
         // {
         //     PropertyChanged -= OnPropertyChanged;
@@ -298,7 +298,7 @@ public partial class SettingsViewModel : ViewModelBase
             Concurrency = settings.Concurrency;
             AutoResumeOnLaunch = settings.AutoResumeOnLaunch;
             EnableScriptAutoDetection = settings.EnableScriptAutoDetection;
-            
+
             if (settings.SpeedLimitBytesPerSec.HasValue)
             {
                 SpeedLimitEnabled = true;

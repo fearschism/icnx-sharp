@@ -2,7 +2,9 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ICNX.Core.Models;
+using ICNX.Core.Interfaces;
 using ICNX.Core.Services;
+using ICNX.Persistence.Services;
 using ICNX.Persistence.Repositories;
 using System.Text.Json;
 
@@ -10,13 +12,13 @@ namespace ICNX.Tests.Core.Services;
 
 public class SettingsServiceTests
 {
-    private readonly Mock<SettingsRepository> _mockRepository;
+    private readonly Mock<ISettingsRepository> _mockRepository;
     private readonly Mock<ILogger<SettingsService>> _mockLogger;
     private readonly SettingsService _settingsService;
 
     public SettingsServiceTests()
     {
-        _mockRepository = new Mock<SettingsRepository>("test", Mock.Of<ILogger<SettingsRepository>>());
+        _mockRepository = new Mock<ISettingsRepository>();
         _mockLogger = new Mock<ILogger<SettingsService>>();
         _settingsService = new SettingsService(_mockRepository.Object, _mockLogger.Object);
     }
@@ -60,7 +62,7 @@ public class SettingsServiceTests
         // Arrange
         var originalSettings = new Settings { Concurrency = 4 };
         var newSettings = new Settings { Concurrency = 8 };
-        
+
         _mockRepository.Setup(r => r.GetSettingsAsync()).ReturnsAsync(originalSettings);
         _mockRepository.Setup(r => r.SaveSettingsAsync(It.IsAny<Settings>())).Returns(Task.CompletedTask);
 
@@ -89,7 +91,7 @@ public class SettingsServiceTests
         // Act
         await _settingsService.UpdateConcurrencyAsync(0); // Below minimum
         var result1 = await _settingsService.GetSettingsAsync();
-        
+
         await _settingsService.UpdateConcurrencyAsync(20); // Above maximum
         var result2 = await _settingsService.GetSettingsAsync();
 
@@ -138,9 +140,9 @@ public class SettingsServiceTests
             Concurrency = 6,
             EnableScriptAutoDetection = true
         };
-        
+
         _mockRepository.Setup(r => r.GetSettingsAsync()).ReturnsAsync(settings);
-        
+
         var tempFile = Path.GetTempFileName();
 
         try
@@ -151,10 +153,10 @@ public class SettingsServiceTests
             // Assert
             result.Should().Be(tempFile);
             File.Exists(tempFile).Should().BeTrue();
-            
+
             var json = await File.ReadAllTextAsync(tempFile);
             var exportedSettings = JsonSerializer.Deserialize<Settings>(json);
-            
+
             exportedSettings.Should().NotBeNull();
             exportedSettings!.DefaultDownloadDir.Should().Be(settings.DefaultDownloadDir);
             exportedSettings.Concurrency.Should().Be(settings.Concurrency);
@@ -212,11 +214,11 @@ public class SettingsServiceTests
             Concurrency = 8,
             AutoResumeOnLaunch = false
         };
-        
+
         var json = JsonSerializer.Serialize(validSettings, new JsonSerializerOptions { WriteIndented = true });
         var tempFile = Path.GetTempFileName();
         await File.WriteAllTextAsync(tempFile, json);
-        
+
         _mockRepository.Setup(r => r.SaveSettingsAsync(It.IsAny<Settings>())).Returns(Task.CompletedTask);
 
         try
@@ -226,7 +228,7 @@ public class SettingsServiceTests
 
             // Assert
             result.Should().BeTrue();
-            _mockRepository.Verify(r => r.SaveSettingsAsync(It.Is<Settings>(s => 
+            _mockRepository.Verify(r => r.SaveSettingsAsync(It.Is<Settings>(s =>
                 s.DefaultDownloadDir == validSettings.DefaultDownloadDir &&
                 s.Concurrency == validSettings.Concurrency)), Times.Once);
         }

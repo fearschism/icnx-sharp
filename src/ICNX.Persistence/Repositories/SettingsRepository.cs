@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Dapper;
+using ICNX.Core.Interfaces;
 using ICNX.Core.Models;
 using Microsoft.Extensions.Logging;
 
@@ -8,11 +9,11 @@ namespace ICNX.Persistence.Repositories;
 /// <summary>
 /// Repository for application settings (single row configuration)
 /// </summary>
-public class SettingsRepository : BaseRepository<Settings>
+public class SettingsRepository : BaseRepository<Settings>, ISettingsRepository
 {
     private const string MainSettingsId = "main";
 
-    public SettingsRepository(string connectionString, ILogger<SettingsRepository> logger) 
+    public SettingsRepository(string connectionString, ILogger<SettingsRepository> logger)
         : base(connectionString, logger)
     {
     }
@@ -52,7 +53,7 @@ public class SettingsRepository : BaseRepository<Settings>
     /// <summary>
     /// Get the current application settings
     /// </summary>
-    public async Task<Settings?> GetSettingsAsync()
+    public virtual async Task<Settings?> GetSettingsAsync()
     {
         return await ExecuteWithConnectionAsync(async connection =>
         {
@@ -60,9 +61,9 @@ public class SettingsRepository : BaseRepository<Settings>
                 SELECT settings_json, updated_at 
                 FROM settings 
                 WHERE id = @Id";
-            
+
             var result = await connection.QueryFirstOrDefaultAsync(sql, new { Id = MainSettingsId });
-            
+
             if (result?.settings_json == null)
             {
                 // Return default settings if none exist
@@ -85,7 +86,7 @@ public class SettingsRepository : BaseRepository<Settings>
     /// <summary>
     /// Save application settings
     /// </summary>
-    public async Task SaveSettingsAsync(Settings settings)
+    public virtual async Task SaveSettingsAsync(Settings settings)
     {
         await ExecuteWithConnectionAsync(async connection =>
         {
@@ -96,9 +97,9 @@ public class SettingsRepository : BaseRepository<Settings>
                     settings_json = excluded.settings_json,
                     updated_at = excluded.updated_at";
 
-            var settingsJson = JsonSerializer.Serialize(settings, new JsonSerializerOptions 
-            { 
-                WriteIndented = true 
+            var settingsJson = JsonSerializer.Serialize(settings, new JsonSerializerOptions
+            {
+                WriteIndented = true
             });
 
             await connection.ExecuteAsync(upsertSql, new
@@ -119,7 +120,7 @@ public class SettingsRepository : BaseRepository<Settings>
     {
         var defaultSettings = CreateDefaultSettings();
         await SaveSettingsAsync(defaultSettings);
-        
+
         Logger.LogInformation("Settings reset to defaults");
     }
 
@@ -144,7 +145,7 @@ public class SettingsRepository : BaseRepository<Settings>
                 Logger.LogWarning(ex, "Failed to convert setting {Key} to type {Type}", key, typeof(T));
             }
         }
-        
+
         return default;
     }
 
@@ -156,7 +157,7 @@ public class SettingsRepository : BaseRepository<Settings>
         var settings = await GetSettingsAsync() ?? CreateDefaultSettings();
         settings.CustomSettings[key] = value!;
         await SaveSettingsAsync(settings);
-        
+
         Logger.LogInformation("Setting {Key} updated", key);
     }
 
@@ -169,7 +170,7 @@ public class SettingsRepository : BaseRepository<Settings>
         {
             const string sql = "SELECT updated_at FROM settings WHERE id = @Id";
             var result = await connection.QueryFirstOrDefaultAsync<string>(sql, new { Id = MainSettingsId });
-            
+
             return result != null ? DateTime.Parse(result) : (DateTime?)null;
         });
     }
@@ -179,7 +180,7 @@ public class SettingsRepository : BaseRepository<Settings>
         return new Settings
         {
             DefaultDownloadDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), 
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 "Downloads", "ICNX"),
             Concurrency = 4,
             RetryLimit = 3,
